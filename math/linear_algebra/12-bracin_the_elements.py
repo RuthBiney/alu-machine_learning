@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import numpy as np
+"import numpy as np"
 
 def np_elementwise(mat1, mat2):
     elementwise_sum = mat1 + mat2
