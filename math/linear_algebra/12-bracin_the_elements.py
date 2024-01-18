@@ -10,4 +10,7 @@ def np_elementwise(mat1, mat2):
     elementwise_prod = mat1 * mat2
     elementwise_quot = mat1 / mat2
 
-    return elementwise_sum, elementwise_diff, elementwise_prod, elementwise_quot
+    return (elementwise_sum,
+            elementwise_diff,
+            elementwise_prod,
+            elementwise_quot)
