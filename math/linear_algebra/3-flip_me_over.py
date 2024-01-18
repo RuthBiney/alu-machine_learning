@@ -8,7 +8,7 @@ def matrix_transpose(matrix):
     # Transpose the matrix using list comprehension
     return [
         [
-            matrix[j][i] 
-            for j in range(len(matrix))] 
-            for i in range(len(matrix[0]))
-        ]
+            matrix[j][i]
+            for j in range(len(matrix))]
+        for i in range(len(matrix[0]))
+    ]
