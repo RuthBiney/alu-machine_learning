@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-"""cat_matrices2D = __import__('7-gettin_cozy').cat_matrices2D"""
+"""cat_matrices2D .cat_matrices2D"""
 
 
 def cat_matrices2D(mat1, mat2, axis=0):
+    """A function that concatenates two matrices"""
     if axis == 0:
         """Check if the matrices have the same number of columns"""
         if len(mat1[0]) != len(mat2[0]):
