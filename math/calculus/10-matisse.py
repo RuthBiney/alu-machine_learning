@@ -9,6 +9,12 @@
 
 
 def poly_derivative(poly):
+    '''
+        Calculate the derivative of a polynomial.
+
+        Parameters:
+        poly (list): A list of coefficients.
+    '''
     # Check if poly is not a list or is an empty list
     if not isinstance(poly, list) or not poly:
         return None
