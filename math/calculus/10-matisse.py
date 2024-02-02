@@ -2,6 +2,9 @@
 '''
     a function def poly_derivative(poly):
     that calculates the derivative of a polynomial
+
+    Parameters:
+    poly (list): A list of coefficients.
 '''
 
 
