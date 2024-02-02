@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-'''
-    a function def poly_derivative(poly):
-    that calculates the derivative of a polynomial
+# '''
+#     a function def poly_derivative(poly):
+#     that calculates the derivative of a polynomial
 
-    Parameters:
-    poly (list): A list of coefficients.
-'''
+#     Parameters:
+#     poly (list): A list of coefficients.
+# '''
 
 
 def poly_derivative(poly):
