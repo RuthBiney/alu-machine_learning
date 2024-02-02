@@ -14,10 +14,3 @@ def poly_derivative(poly):
         return [0]
     # Calculate the derivative
     return [poly[i] * i for i in range(1, len(poly))]
-
-
-# Tests
-print(poly_derivative([5, 3, 0, 1]))  # Expected output: [3, 0, 3]
-print(poly_derivative([5]))           # Expected output: [0]
-print(poly_derivative([]))            # Expected output: None
-print(poly_derivative("not a list"))  # Expected output: None
