@@ -30,6 +30,7 @@ class Binomial:
                 raise ValueError("data must contain multiple values")
             p = sum(data) / len(data)
             n = round(sum(data) / p)
+            p = sum(data) / n
             self.n = int(n)
             self.p = p
 
