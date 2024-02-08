@@ -35,3 +35,13 @@ class Poisson:
         pmf_value = (self.lambtha ** k) * \
             self.exp(-self.lambtha) / self.factorial(k)
         return pmf_value
+
+
+# Using the class
+np.random.seed(0)
+data = np.random.poisson(5., 100).tolist()
+p1 = Poisson(data)
+print('P(9):', round(p1.pmf(9), 10))  # Rounding to 10 decimal places
+
+p2 = Poisson(lambtha=5)
+print('P(9):', round(p2.pmf(9), 10))  # Rounding to 10 decimal places
