@@ -1,55 +1,76 @@
 #!/usr/bin/env python3
-"""Represents a normal distribution."""
+'''
+    Normal distribution
+'''
 
 
 class Normal:
-    """
-    Represents a normal distribution.
-
-    Attributes:
-    - mean (float): The mean of the distribution.
-    - stddev (float): The standard deviation of the distribution.
-    """
+    '''
+        Class Normal that represents
+        a normal distribution
+    '''
 
     def __init__(self, data=None, mean=0., stddev=1.):
-        """
-        Initializes a Normal distribution.
-
-        """
+        '''
+            Class constructor
+        '''
         if data is None:
-            if stddev <= 0:
+            if stddev < 1:
                 raise ValueError("stddev must be a positive value")
-            self.mean = float(mean)
-            self.stddev = float(stddev)
+            else:
+                self.stddev = float(stddev)
+                self.mean = float(mean)
         else:
-            if not isinstance(data, list):
+            if type(data) is not list:
                 raise TypeError("data must be a list")
-            if len(data) < 2:
+            elif len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            self.mean = sum(data) / len(data)
-            self.stddev = (
-                sum((x - self.mean) ** 2 for x in data) / len(data)) ** 0.5
-            if self.stddev <= 0:
-                raise ValueError("stddev must be a positive value")
+            else:
+                mean = float(sum(data) / len(data))
+                self.mean = mean
+                summation = 0
+                for x in data:
+                    summation += ((x - mean) ** 2)
+                stddev = (summation / len(data)) ** (1 / 2)
+                self.stddev = stddev
+
+    def z_score(self, x):
+        '''
+            Calculates the z-score of a given x-value
+        '''
+        return (x - self.mean) / self.stddev
+
+    def x_value(self, z):
+        '''
+            Calculates the x-value of a given z-score
+        '''
+        return (z * self.stddev) + self.mean
 
     def pdf(self, x):
-        """
-        Calculates the value of the PDF for a given x-value.
-
-        Args:
-        - x (float): The x-value.
-
-        Returns:
-        - float: The PDF value for x.
-        """
-        exponent = -((x - self.mean) ** 2) / (2 * self.stddev ** 2)
-        coefficient = 1 / (self.stddev * (2 * 3.1415926536) ** 0.5)
-        return coefficient * (2.7182818285 ** exponent)
+        '''
+            Calculates the value of the
+            PDF for a given x-value
+        '''
+        mean = self.mean
+        stddev = self.stddev
+        e = 2.7182818285
+        pi = 3.1415926536
+        power = -0.5 * (self.z_score(x) ** 2)
+        coefficient = 1 / (stddev * ((2 * pi) ** (1 / 2)))
+        pdf = coefficient * (e ** power)
+        return pdf
 
     def cdf(self, x):
-        """
-        Calculates the value of the CDF for a given x-value.
-
-        """
-        z = (x - self.mean) / self.stddev
-        return (1 + math.erf(z / math.sqrt(2))) / 2
+        '''
+            Calculates the value of the
+            CDF for a given x-value
+        '''
+        mean = self.mean
+        stddev = self.stddev
+        pi = 3.1415926536
+        value = (x - mean) / (stddev * (2 ** (1 / 2)))
+        val = value - ((value ** 3) / 3) + ((value ** 5) / 10)
+        val = val - ((value ** 7) / 42) + ((value ** 9) / 216)
+        val *= (2 / (pi ** (1 / 2)))
+        cdf = (1 / 2) * (1 + val)
+        return cdf
