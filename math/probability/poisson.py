@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
 class Poisson:
-    """
-    Represents a Poisson distribution.
-
-    Attributes:
-        lambtha (float): The expected number of occurrences in a given time frame.
-
-    Methods:
-        __init__(self, data=None, lambtha=1.): Initializes a Poisson distribution.
-        pmf(self, k): Calculates the PMF (Probability Mass Function) for a given number of successes without using external imports.
-    """
-
     def __init__(self, data=None, lambtha=1.):
         if data is None:
             if lambtha <= 0:
@@ -23,25 +12,28 @@ class Poisson:
                 raise ValueError("data must contain multiple values")
             self.lambtha = float(sum(data) / len(data))
 
-    def factorial(self, n):
-        """Calculates factorial of n (n!) without using external imports."""
-        if n == 0:
+    def factorial(self, k):
+        """Calculates the factorial of k."""
+        if k == 0:
             return 1
         else:
-            return n * self.factorial(n-1)
-
-    def exp(self, x):
-        """Calculates the exponential of x using a series expansion."""
-        n_terms = 10  # Number of terms to include in the series expansion for approximation
-        return sum(x**i / self.factorial(i) for i in range(n_terms))
+            return k * self.factorial(k - 1)
 
     def pmf(self, k):
-        """
-        Calculates the Probability Mass Function (PMF)
-        """
-        k = int(k)  # Convert k to an integer
+        """Calculates the PMF for a given number of successes."""
+        k = int(k)  # Ensure k is an integer
         if k < 0:
-            return 0  # Return 0 if k is out of range (negative)
+            return 0  # PMF is 0 if k is out of range
 
-        # Calculate and return the PMF value without using external imports
-        return (self.lambtha ** k) * self.exp(-self.lambtha) / self.factorial(k)
+        # Calculate PMF using the formula: (lambtha^k * e^(-lambtha)) / k!
+        lambtha = self.lambtha
+        e_minus_lambtha = self.exp(-lambtha)
+        lambtha_k = lambtha ** k
+        k_factorial = self.factorial(k)
+        pmf_value = (lambtha_k * e_minus_lambtha) / k_factorial
+        return pmf_value
+
+    def exp(self, x):
+        """Approximates the exponential of x using a series expansion."""
+        n = 100  # Number of terms for approximation
+        return sum((x**i) / self.factorial(i) for i in range(n))
