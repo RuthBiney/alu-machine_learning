@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+"Calculate poisson PMF"
+
+
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
+        "Calculate the poisson PMF"
         if data is None:
             if lambtha <= 0:
                 raise ValueError("lambtha must be a positive value")
@@ -15,6 +19,7 @@ class Poisson:
                 raise ValueError("lambtha must be a positive value")
 
     def pmf(self, k):
+        "Calculate the poisson PMF"
         k = int(k)
         if k < 0:
             return 0
@@ -22,6 +27,7 @@ class Poisson:
             return (self.lambtha ** k) * (2.7182818285 ** (-self.lambtha)) / self.factorial(k)
 
     def factorial(self, n):
+        "Calculate the poisson PMF"
         if n == 0:
             return 1
         else:
