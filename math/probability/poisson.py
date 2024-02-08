@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from math import exp, factorial
-"Initializes the Poisson distribution"
 
 
 class Poisson:
@@ -9,6 +8,7 @@ class Poisson:
 
     def __init__(self, data=None, lambtha=1.):
         "Initializes the Poisson distribution either by estimating lambtha"
+
         if data is None:
             if lambtha <= 0:
                 raise ValueError("lambtha must be a positive value")
@@ -22,6 +22,7 @@ class Poisson:
 
     def pmf(self, k):
         "Calculates the Probability Mass Function (PMF)"
+
         k = int(k)  # Ensure k is an integer
         if k < 0:
             return 0  # Return 0 if k is out of range (negative)
