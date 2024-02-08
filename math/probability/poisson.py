@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import math
+
+
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
         if data is None:
@@ -10,36 +13,24 @@ class Poisson:
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            self.lambtha = sum(data) / len(data)  # Calculate sample mean
-
-    def factorial(self, k):
-        """Calculates the factorial of k."""
-        result = 1
-        for i in range(1, k + 1):
-            result *= i
-        return result
-
-    def exp(self, x):
-        """Approximates the exponential of x using a series expansion."""
-        n = 100  # Number of terms for approximation
-        return sum((x ** i) / self.factorial(i) for i in range(n))
+            self.lambtha = float(sum(data) / len(data))
+            if self.lambtha <= 0:
+                raise ValueError("lambtha must be a positive value")
 
     def pmf(self, k):
-        """Calculates the PMF for a given number of successes."""
-        k = int(k)  # Convert k to an integer
+        k = int(k)
         if k < 0:
-            return 0  # PMF is 0 if k is out of range
-
-        # Calculate PMF using the formula: (lambtha^k * e^(-lambtha)) / k!
-        pmf_value = (self.lambtha ** k) * \
-            self.exp(-self.lambtha) / self.factorial(k)
-        return round(pmf_value, 10)  # Round to 10 decimal places
+            return 0
+        else:
+            return (self.lambtha ** k) * (math.exp(-self.lambtha)) / math.factorial(k)
 
 
-# Using the class
-data = [5] * 100  # Creating a list of 100 elements with value 5
-p1 = Poisson(data)
-print('P(9):', round(p1.pmf(9), 10))
-
-p2 = Poisson(lambtha=5)
-print('P(9):', round(p2.pmf(9), 10))
+# Test cases
+try:
+    p = Poisson(data=[1, 2, 3])
+    print(p.pmf(2))  # Should print the PMF value for k = 2
+    print(p.pmf(1.5))  # Should print the PMF value for k = 1
+    print(p.pmf(5))  # Should print the PMF value for k = 5
+    print(p.pmf(-1))  # Should print 0 as k is out of range
+except Exception as e:
+    print(e)
