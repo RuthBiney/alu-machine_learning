@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-class Exponential:
+"""Represents an exponential distribution."""
 
-    "Represents an exponential distribution."
+
+class Exponential:
+    """
+    Represents an exponential distribution.
+
+    """
 
     def __init__(self, data=None, lambtha=1.):
         """
@@ -23,20 +28,8 @@ class Exponential:
 
 
 # Test cases
-try:
-    exp1 = Exponential(data=[1])
-except ValueError as ve:
-    print(ve)  # Should raise "data must contain multiple values"
-
-try:
-    exp2 = Exponential(data="not a list")
-except TypeError as te:
-    print(te)  # Should raise "data must be a list"
-
-try:
-    exp3 = Exponential(lambtha=-3)
-except ValueError as ve:
-    print(ve)  # Should raise "lambtha must be a positive value"
-
-exp4 = Exponential(lambtha=2)
-print(exp4.lambtha)  # Should print 2.0
+if __name__ == "__main__":
+    exp5 = Exponential(data=[2, 3, 4])
+    print("{:.10f}".format(exp5.lambtha))  # Should print 5.2902751279
+    exp6 = Exponential(data=[1, 2, 3, 4, 5])
+    print("{:.10f}".format(exp6.lambtha))  # Should print 5.5528992355
