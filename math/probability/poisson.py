@@ -31,13 +31,15 @@ class Poisson:
             return 0  # PMF is 0 if k is out of range
 
         # Calculate PMF using the formula: (lambtha^k * e^(-lambtha)) / k!
-        pmf_value = (self.lambtha ** k) * self.exp(-self.lambtha) / self.factorial(k)
-        return round(pmf_value, 10)  # Round to match expected precision
+        pmf_value = (self.lambtha ** k) * \
+            self.exp(-self.lambtha) / self.factorial(k)
+        return round(pmf_value, 10)  # Round to 10 decimal places
+
 
 # Using the class
 data = [5] * 100  # Creating a list of 100 elements with value 5
 p1 = Poisson(data)
-print('P(9):', p1.pmf(9))
+print('P(9):', round(p1.pmf(9), 10))
 
 p2 = Poisson(lambtha=5)
-print('P(9):', p2.pmf(9))
+print('P(9):', round(p2.pmf(9), 10))
