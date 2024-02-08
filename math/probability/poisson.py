@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
+import numpy as np  # Import numpy module
+
+"""Calculate poisson PMF"""
+
+
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
-        """Calculates the PMF"""
+        """Calculate poisson PMF"""
         if data is None:
             if lambtha <= 0:
                 raise ValueError("lambtha must be a positive value")
