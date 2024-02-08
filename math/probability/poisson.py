@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-import math
-
-
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
         if data is None:
@@ -22,7 +19,23 @@ class Poisson:
         if k < 0:
             return 0
         else:
-            return (self.lambtha ** k) * (math.exp(-self.lambtha)) / math.factorial(k)
+            pmf_value = self._poisson_formula(k)
+            return pmf_value
+
+    def _poisson_formula(self, k):
+        if k == 0:
+            return self._poisson_0()
+        else:
+            return self._poisson_recursive(k, self.lambtha)
+
+    def _poisson_recursive(self, k, lambtha):
+        if k == 1:
+            return lambtha
+        else:
+            return (lambtha / k) * self._poisson_recursive(k - 1, lambtha)
+
+    def _poisson_0(self):
+        return math.exp(-self.lambtha)
 
 
 # Test cases
