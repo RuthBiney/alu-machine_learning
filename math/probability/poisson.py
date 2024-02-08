@@ -39,11 +39,9 @@ class Poisson:
 
 
 # Test cases
-try:
+if __name__ == "__main__":
     p = Poisson(data=[1, 2, 3])
-    print(p.pmf(2))  # Should print the PMF value for k = 2
-    print(p.pmf(1.5))  # Should print the PMF value for k = 1
-    print(p.pmf(5))  # Should print the PMF value for k = 5
-    print(p.pmf(-1))  # Should print 0 as k is out of range
-except Exception as e:
-    print(e)
+    print("{:.10f}".format(p.pmf(2)))  # Should print the PMF value for k = 2
+    print("{:.10f}".format(p.pmf(1.5)))  # Should print the PMF value for k = 1
+    print("{:.10f}".format(p.pmf(5)))  # Should print the PMF value for k = 5
+    print("{:.10f}".format(p.pmf(-1)))  # Should print 0 as k is out of range
