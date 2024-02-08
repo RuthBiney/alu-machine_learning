@@ -15,6 +15,16 @@ class Binomial:
         """
         Initializes a Binomial distribution.
 
+        Args:
+        - data (list, optional): The data used to estimate the distribution.
+        - n (int, optional): The number of Bernoulli trials.
+        - p (float, optional): The probability of success.
+
+        Raises:
+        - ValueError: If n is not a positive value.
+                      If p is not a valid probability.
+                      If data is given but does not contain at least two data points.
+        - TypeError: If data is given but not a list.
         """
         if data is None:
             if n <= 0:
@@ -30,7 +40,7 @@ class Binomial:
                 raise ValueError("data must contain multiple values")
             p = sum(data) / len(data)
             n = round(sum(data) / p)
-            p = sum(data) / n
+            p = sum(data) / (n * len(data))
             self.n = int(n)
             self.p = p
 
