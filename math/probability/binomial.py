@@ -48,7 +48,7 @@ class Binomial:
         Returns:
             int: The binomial coefficient.
         """
-        return self._factorial(self.n) / (self._factorial(k) * self._factorial(self.n - k))
+        return self._factorial(self.n) // (self._factorial(k) * self._factorial(self.n - k))
 
     def _factorial(self, x):
         """
@@ -70,7 +70,6 @@ class Binomial:
 
 # Example usage:
 if __name__ == "__main__":
-    import numpy as np
     np.random.seed(0)
     data = np.random.binomial(50, 0.6, 100).tolist()
     b1 = Binomial(data)
