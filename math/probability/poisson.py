@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-from math import exp, factorial
-
-
 class Poisson:
     """
     Represents a Poisson distribution.
@@ -11,7 +8,7 @@ class Poisson:
 
     Methods:
         __init__(self, data=None, lambtha=1.): Initializes a Poisson distribution.
-        pmf(self, k): Calculates the PMF (Probability Mass Function) for a given number of successes.
+        pmf(self, k): Calculates the PMF (Probability Mass Function) for a given number of successes without using external imports.
     """
 
     def __init__(self, data=None, lambtha=1.):
@@ -26,19 +23,25 @@ class Poisson:
                 raise ValueError("data must contain multiple values")
             self.lambtha = float(sum(data) / len(data))
 
+    def factorial(self, n):
+        """Calculates factorial of n (n!) without using external imports."""
+        if n == 0:
+            return 1
+        else:
+            return n * self.factorial(n-1)
+
+    def exp(self, x):
+        """Calculates the exponential of x using a series expansion."""
+        n_terms = 10  # Number of terms to include in the series expansion for approximation
+        return sum(x**i / self.factorial(i) for i in range(n_terms))
+
     def pmf(self, k):
         """
-        Calculates the Probability Mass Function (PMF) for a given number of successes.
-
-        Parameters:
-            k (int or float): The number of successes for which to calculate the PMF.
-
-        Returns:
-            float: The PMF value for k successes, or 0 if k is out of range.
+        Calculates the Probability Mass Function (PMF)
         """
         k = int(k)  # Convert k to an integer
         if k < 0:
             return 0  # Return 0 if k is out of range (negative)
 
-        # Calculate and return the PMF value
-        return (self.lambtha ** k) * exp(-self.lambtha) / factorial(k)
+        # Calculate and return the PMF value without using external imports
+        return (self.lambtha ** k) * self.exp(-self.lambtha) / self.factorial(k)
