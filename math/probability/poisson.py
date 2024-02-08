@@ -35,13 +35,3 @@ class Poisson:
         pmf_value = (self.lambtha ** k) * \
             self.exp(-self.lambtha) / self.factorial(k)
         return pmf_value
-
-
-# Using the class
-np.random.seed(0)
-data = np.random.poisson(5., 100).tolist()
-p1 = Poisson(data)
-print('P(9):', '{:.10f}'.format(p1.pmf(9)))
-
-p2 = Poisson(lambtha=5)
-print('P(9):', '{:.10f}'.format(p2.pmf(9)))
