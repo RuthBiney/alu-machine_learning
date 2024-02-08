@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """Represents a normal distribution."""
-import math
 
 
 class Normal:
     """
     Represents a normal distribution.
 
-    Attributes:
-    - mean (float): The mean of the distribution.
-    - stddev (float): The standard deviation of the distribution.
+
     """
 
     def __init__(self, data=None, mean=0., stddev=1.):
@@ -44,5 +41,5 @@ class Normal:
         - float: The PDF value for x.
         """
         exponent = -((x - self.mean) ** 2) / (2 * self.stddev ** 2)
-        coefficient = 1 / (self.stddev * math.sqrt(2 * math.pi))
-        return coefficient * math.exp(exponent)
+        coefficient = 1 / (self.stddev * (2 * 3.14159) ** 0.5)
+        return coefficient * (2.71828 ** exponent)
