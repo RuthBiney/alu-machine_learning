@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Define the Poisson class
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
         if data is None:
@@ -11,7 +10,7 @@ class Poisson:
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            self.lambtha = sum(data) / len(data)
+            self.lambtha = sum(data) / len(data)  # Calculate sample mean
 
     def factorial(self, k):
         """Calculates the factorial of k."""
@@ -23,7 +22,7 @@ class Poisson:
     def exp(self, x):
         """Approximates the exponential of x using a series expansion."""
         n = 100  # Number of terms for approximation
-        return sum((x**i) / self.factorial(i) for i in range(n))
+        return sum((x ** i) / self.factorial(i) for i in range(n))
 
     def pmf(self, k):
         """Calculates the PMF for a given number of successes."""
@@ -32,15 +31,13 @@ class Poisson:
             return 0  # PMF is 0 if k is out of range
 
         # Calculate PMF using the formula: (lambtha^k * e^(-lambtha)) / k!
-        pmf_value = (self.lambtha ** k) * \
-            self.exp(-self.lambtha) / self.factorial(k)
-        return pmf_value
-
+        pmf_value = (self.lambtha ** k) * self.exp(-self.lambtha) / self.factorial(k)
+        return round(pmf_value, 10)  # Round to match expected precision
 
 # Using the class
 data = [5] * 100  # Creating a list of 100 elements with value 5
 p1 = Poisson(data)
-print('P(9):', round(p1.pmf(9), 10))  # Rounding to 10 decimal places
+print('P(9):', p1.pmf(9))
 
 p2 = Poisson(lambtha=5)
-print('P(9):', round(p2.pmf(9), 10))  # Rounding to 10 decimal places
+print('P(9):', p2.pmf(9))
