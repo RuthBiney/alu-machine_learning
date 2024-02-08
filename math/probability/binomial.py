@@ -10,18 +10,12 @@ class Binomial:
         n (int): Number of Bernoulli trials.
         p (float): Probability of a success in each trial.
 
-    Methods:
-        __init__(self, data=None, n=1, p=0.5): Initializes the Binomial distribution.
+
     """
 
     def __init__(self, data=None, n=1, p=0.5):
         """
         The constructor for Binomial class.
-
-        Parameters:
-            data (list, optional): A list of data to be used to estimate the distribution. Default is None.
-            n (int, optional): The number of Bernoulli trials. Default is 1.
-            p (float, optional): The probability of a success. Default is 0.5.
 
         Raises:
             ValueError: If 'n' is not a positive value.
@@ -29,8 +23,7 @@ class Binomial:
             TypeError: If 'data' is not a list when provided.
             ValueError: If 'data' does not contain at least two values.
 
-        When 'data' is provided, 'n' and 'p' are calculated based on the data.
-        Otherwise, 'n' and 'p' are set based on the provided values.
+
         """
 
         if data is None:
