@@ -4,66 +4,61 @@
 
 class Binomial:
     """
-    Represents a binomial distribution.
+    A class to represent a binomial distribution.
 
     Attributes:
-    - n (int): The number of Bernoulli trials.
-    - p (float): The probability of success.
+        n (int): Number of Bernoulli trials.
+        p (float): Probability of a success in each trial.
+
+    Methods:
+        __init__(self, data=None, n=1, p=0.5): Initializes the Binomial distribution.
     """
 
     def __init__(self, data=None, n=1, p=0.5):
         """
-        Initializes a Binomial distribution.
+        The constructor for Binomial class.
 
-        Args:
-        - data (list, optional): The data used to estimate the distribution.
-        - n (int, optional): The number of Bernoulli trials.
-        - p (float, optional): The probability of success.
+        Parameters:
+            data (list, optional): A list of data to be used to estimate the distribution. Default is None.
+            n (int, optional): The number of Bernoulli trials. Default is 1.
+            p (float, optional): The probability of a success. Default is 0.5.
 
         Raises:
-        - ValueError: If n is not a positive value.
-                      If p is not a valid probability.
-                      If data is given but does not contain at least two data points.
-        - TypeError: If data is given but not a list.
+            ValueError: If 'n' is not a positive value.
+            ValueError: If 'p' is not in the range (0, 1).
+            TypeError: If 'data' is not a list when provided.
+            ValueError: If 'data' does not contain at least two values.
+
+        When 'data' is provided, 'n' and 'p' are calculated based on the data.
+        Otherwise, 'n' and 'p' are set based on the provided values.
         """
+
         if data is None:
+            # Validate 'n' and 'p' when no data is provided
             if n <= 0:
                 raise ValueError("n must be a positive value")
-            if not 0 < p < 1:
+            if not (0 < p < 1):
                 raise ValueError("p must be greater than 0 and less than 1")
-            self.n = int(n)
-            self.p = float(p)
+            self.n = int(n)  # Save 'n' as an integer
+            self.p = float(p)  # Save 'p' as a float
         else:
+            # Validate 'data'
             if not isinstance(data, list):
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            p = sum(data) / len(data)
-            n = round(sum(data) / p)
-            p = sum(data) / (n * len(data))
-            self.n = int(n)
-            self.p = p
 
+            # Calculate 'p' as the mean of successes per trial in the data
+            mean_data = sum(data) / len(data)
 
-# Test cases
-if __name__ == "__main__":
-    try:
-        binomial1 = Binomial(n=-2)
-    except ValueError as ve:
-        print(ve)  # Should raise "n must be a positive value"
+            # Initial calculation of 'n' and 'p' based on the data provided
+            variance_data = sum((xi - mean_data) **
+                                2 for xi in data) / len(data)
+            p_initial = 1 - variance_data / mean_data
+            n_initial = round(mean_data / p_initial)
 
-    try:
-        binomial2 = Binomial(p=0.2)
-    except ValueError as ve:
-        print(ve)  # Should raise "data must contain multiple values"
+            # Recalculate 'p' with the rounded 'n' value for accuracy
+            p_final = mean_data / n_initial
 
-    try:
-        binomial3 = Binomial(data=[0.4])
-    except ValueError as ve:
-        print(ve)  # Should raise "data must contain multiple values"
-
-    binomial4 = Binomial(data=[1, 1, 1, 1])
-    print(binomial4.n, binomial4.p)  # Should print the calculated n and p
-
-    binomial5 = Binomial(data=[84, 84, 84, 84, 85, 85, 85, 85, 85])
-    print(binomial5.n, binomial5.p)  # Should print the calculated n and p
+            self.n = n_initial  # Set the calculated 'n'
+            self.p = p_final  # Set the recalculated 'p'
