@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Represents a binomial distribution."""
+"""Represents a binomial distribution.,,"""
 
 
 class Binomial:
@@ -14,11 +14,6 @@ class Binomial:
     def __init__(self, data=None, n=1, p=0.5):
         """
         Initializes a Binomial distribution.
-
-        Args:
-        - data (list, optional): The data used to estimate the distribution.
-        - n (int, optional): The number of Bernoulli trials.
-        - p (float, optional): The probability of success.
 
         """
         if data is None:
@@ -56,5 +51,8 @@ if __name__ == "__main__":
     except ValueError as ve:
         print(ve)  # Should raise "data must contain multiple values"
 
-    binomial4 = Binomial(data=[0.3, 0.6, 0.2, 0.7])
+    binomial4 = Binomial(data=[1, 1, 1, 1])
     print(binomial4.n, binomial4.p)  # Should print the calculated n and p
+
+    binomial5 = Binomial(data=[84, 84, 84, 84, 85, 85, 85, 85, 85])
+    print(binomial5.n, binomial5.p)  # Should print the calculated n and p
