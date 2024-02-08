@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Represents a normal distribution."""
+import math
 
 
 class Normal:
     """
     Represents a normal distribution.
 
+    Attributes:
+    - mean (float): The mean of the distribution.
+    - stddev (float): The standard deviation of the distribution.
     """
 
     def __init__(self, data=None, mean=0., stddev=1.):
@@ -29,26 +33,16 @@ class Normal:
             if self.stddev <= 0:
                 raise ValueError("stddev must be a positive value")
 
-    def z_score(self, x):
+    def pdf(self, x):
         """
-        Calculates the z-score of a given x-value.
+        Calculates the value of the PDF for a given x-value.
 
         Args:
         - x (float): The x-value.
 
         Returns:
-        - float: The z-score of x.
+        - float: The PDF value for x.
         """
-        return (x - self.mean) / self.stddev
-
-    def x_value(self, z):
-        """
-        Calculates the x-value of a given z-score.
-
-        Args:
-        - z (float): The z-score.
-
-        Returns:
-        - float: The x-value of z.
-        """
-        return self.mean + z * self.stddev
+        exponent = -((x - self.mean) ** 2) / (2 * self.stddev ** 2)
+        coefficient = 1 / (self.stddev * math.sqrt(2 * math.pi))
+        return coefficient * math.exp(exponent)
