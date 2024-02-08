@@ -19,23 +19,13 @@ class Poisson:
         if k < 0:
             return 0
         else:
-            pmf_value = self._poisson_formula(k)
-            return pmf_value
+            return (self.lambtha ** k) * (2.71828 ** (-self.lambtha)) / self.factorial(k)
 
-    def _poisson_formula(self, k):
-        if k == 0:
-            return self._poisson_0()
+    def factorial(self, n):
+        if n == 0:
+            return 1
         else:
-            return self._poisson_recursive(k, self.lambtha)
-
-    def _poisson_recursive(self, k, lambtha):
-        if k == 1:
-            return lambtha
-        else:
-            return (lambtha / k) * self._poisson_recursive(k - 1, lambtha)
-
-    def _poisson_0(self):
-        return math.exp(-self.lambtha)
+            return n * self.factorial(n - 1)
 
 
 # Test cases
@@ -43,5 +33,3 @@ if __name__ == "__main__":
     p = Poisson(data=[1, 2, 3])
     print("{:.10f}".format(p.pmf(2)))  # Should print the PMF value for k = 2
     print("{:.10f}".format(p.pmf(1.5)))  # Should print the PMF value for k = 1
-    print("{:.10f}".format(p.pmf(5)))  # Should print the PMF value for k = 5
-    print("{:.10f}".format(p.pmf(-1)))  # Should print 0 as k is out of range
