@@ -26,10 +26,19 @@ class Exponential:
             if self.lambtha <= 0:
                 raise ValueError("lambtha must be a positive value")
 
+    def pdf(self, x):
+        """
+        Calculates the value of the PDF for a given time period.
+
+        """
+        if x < 0:
+            return 0
+        else:
+            return self.lambtha * 2.7182818285 ** (-self.lambtha * x)
+
 
 # Test cases
 if __name__ == "__main__":
-    exp5 = Exponential(data=[2, 3, 4])
-    print("{:.10f}".format(exp5.lambtha))  # Should print 5.2902751279
-    exp6 = Exponential(data=[1, 2, 3, 4, 5])
-    print("{:.10f}".format(exp6.lambtha))  # Should print 5.5528992355
+    exp = Exponential(data=[2, 3, 4])
+    print("{:.10f}".format(exp.pdf(1)))  # Test pdf at x=1
+    print("{:.10f}".format(exp.pdf(2.5)))  # Test pdf at x=2.5
