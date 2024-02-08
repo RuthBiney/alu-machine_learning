@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 class Poisson:
+    "Initialising the poisson distribution based on the given data"
     def __init__(self, data=None, lambtha=1.):
         "Initialising the poisson distribution based on the given data"
         if data is None:
