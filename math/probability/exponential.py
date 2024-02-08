@@ -36,9 +36,19 @@ class Exponential:
         else:
             return self.lambtha * 2.7182818285 ** (-self.lambtha * x)
 
+    def cdf(self, x):
+        """
+        Calculates the value of the CDF for a given time period.
+
+        """
+        if x < 0:
+            return 0
+        else:
+            return 1 - 2.7182818285 ** (-self.lambtha * x)
+
 
 # Test cases
 if __name__ == "__main__":
     exp = Exponential(data=[2, 3, 4])
-    print("{:.10f}".format(exp.pdf(1)))  # Test pdf at x=1
-    print("{:.10f}".format(exp.pdf(2.5)))  # Test pdf at x=2.5
+    print("{:.10f}".format(exp.cdf(1)))  # Test cdf at x=1
+    print("{:.10f}".format(exp.cdf(2.5)))  # Test cdf at x=2.5
