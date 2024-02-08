@@ -6,7 +6,9 @@ class Normal:
     """
     Represents a normal distribution.
 
-
+    Attributes:
+    - mean (float): The mean of the distribution.
+    - stddev (float): The standard deviation of the distribution.
     """
 
     def __init__(self, data=None, mean=0., stddev=1.):
@@ -42,4 +44,4 @@ class Normal:
         """
         exponent = -((x - self.mean) ** 2) / (2 * self.stddev ** 2)
         coefficient = 1 / (self.stddev * (2 * 3.14159) ** 0.5)
-        return coefficient * (2.71828 ** exponent)
+        return coefficient * (2.7182818285 ** exponent)
