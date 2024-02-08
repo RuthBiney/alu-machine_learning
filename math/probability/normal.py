@@ -19,7 +19,6 @@ class Normal:
         if data is None:
             if stddev <= 0:
                 raise ValueError("stddev must be a positive value")
-            self.mean = float(mean)
             self.stddev = float(stddev)
         else:
             if not isinstance(data, list):
@@ -43,5 +42,5 @@ class Normal:
         - float: The PDF value for x.
         """
         exponent = -((x - self.mean) ** 2) / (2 * self.stddev ** 2)
-        coefficient = 1 / (self.stddev * (2 * 3.14159) ** 0.5)
+        coefficient = 1 / (self.stddev * (2 * 3.1415926536) ** 0.5)
         return coefficient * (2.7182818285 ** exponent)
