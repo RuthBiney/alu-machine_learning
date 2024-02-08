@@ -3,6 +3,7 @@
 
 
 class Poisson:
+    "Calculate the poisson PMF"
     def __init__(self, data=None, lambtha=1.):
         "Calculate the poisson PMF"
         if data is None:
