@@ -1,79 +1,83 @@
 #!/usr/bin/env python3
-"""Represents a binomial distribution.,,"""
+'''
+    Binomial distribution
+'''
 
 
 class Binomial:
-    def __init__(self, data=None, n=1, p=0.5):
+    '''
+        Binomial distribution class
+    '''
+
+    def _init_(self, data=None, n=1, p=0.5):
+        '''
+            Class constructor
+        '''
         if data is None:
-            if n <= 0:
+            if n < 1:
                 raise ValueError("n must be a positive value")
-            if not (0 < p < 1):
+            else:
+                self.n = n
+            if p <= 0 or p >= 1:
                 raise ValueError("p must be greater than 0 and less than 1")
-            self.n = int(n)
-            self.p = float(p)
+            else:
+                self.p = p
         else:
-            if not isinstance(data, list):
-                raise TypeError("data must be a list")
+            if type(data) is not list:
+                raise TypeError('data must be a list')
             if len(data) < 2:
-                raise ValueError("data must contain multiple values")
-            # Calculate n and p from the data
-            self.n = len(data)
-            self.p = sum(data) / len(data)
+                raise ValueError('data must contain multiple values')
+            mean = float(sum(data) / len(data))
+            summation = 0
+            for x in data:
+                summation += ((x - mean) ** 2)
+            variance = (summation / len(data))
+            q = variance / mean
+            p = (1 - q)
+            n = round(mean / p)
+            p = float(mean / n)
+            self.n = n
+            self.p = p
 
     def pmf(self, k):
-        """
-        Calculate the value of the PMF for a given number of successes k.
-
-        Parameters:
-            k (int): The number of successes.
-
-        Returns:
-            float: The PMF value for k.
-        """
-        k = int(k)  # Convert k to an integer
-        if k < 0 or k > self.n:  # Check if k is out of range
+        '''
+            Calculates the value of the
+            PMF for a given number of successes
+        '''
+        if type(k) is not int:
+            k = int(k)
+        if k < 0:
             return 0
-        binom_coeff = self._binomial_coefficient(k)
-        pmf_value = binom_coeff * (self.p ** k) * \
-            ((1 - self.p) ** (self.n - k))
-        return pmf_value
+        p = self.p
+        n = self.n
+        q = (1 - p)
+        n_factorial = 1
+        for i in range(n):
+            n_factorial *= (i + 1)
+        k_factorial = 1
+        for i in range(k):
+            k_factorial *= (i + 1)
+        nk_factorial = 1
+        for i in range(n - k):
+            nk_factorial *= (i + 1)
+        binomial_co = n_factorial / (k_factorial * nk_factorial)
+        pmf = binomial_co * (p ** k) * (q ** (n - k))
+        return pmf
 
-    def _binomial_coefficient(self, k):
-        """
-        Calculate the binomial coefficient (n choose k).
-
-        Parameters:
-            k (int): The number of successes.
-
-        Returns:
-            int: The binomial coefficient.
-        """
-        return self._factorial(self.n) // (self._factorial(k) * self._factorial(self.n - k))
-
-    def _factorial(self, x):
-        """
-        Calculate the factorial of a number x.
-
-        Parameters:
-            x (int): The number to calculate the factorial of.
-
-        Returns:
-            int: The factorial of x.
-        """
-        if x == 0:
-            return 1
-        result = 1
-        for i in range(1, x + 1):
-            result *= i
-        return result
-
-
-# Example usage:
-if __name__ == "__main__":
-    np.random.seed(0)
-    data = np.random.binomial(50, 0.6, 100).tolist()
-    b1 = Binomial(data)
-    print('P(30):', b1.pmf(30))
-
-    b2 = Binomial(n=50, p=0.6)
-    print('P(30):', b2.pmf(30))
+    def cdf(self, k):
+        '''
+            Calculates the value of the
+            CDF for a given number of successes
+        '''
+        if type(k) is not int:
+            k = int(k)
+        if k < 0:
+            return 0
+        p = self.p
+        n = self.n
+        q = (1 - p)
+        summation = 0
+        for i in range(k + 1):
+            summation += self.pmf(i)
+        cdf = summation
+        return cdf
