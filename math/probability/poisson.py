@@ -1,45 +1,63 @@
 #!/usr/bin/env python3
-"""Poisson Distribution"""
+'''
+    Poisson distribution
+    that represents a poisson distribution
+'''
 
 
 class Poisson:
-    """Poisson Distribution"""
+    '''
+        Class Poisson that represents a
+        distribution of Poisson
+    '''
 
-    def __init__(self, data=None, lambtha=1.):
-        """ Class Poisson that represents a distribution of Poisson"""
-        if data is None:
-            if lambtha <= 0:
-                raise ValueError("lambtha must be a positive value")
-            self.lambtha = float(lambtha)
-        else:
-            if not isinstance(data, list):
-                raise TypeError("data must be a list")
-            if len(data) < 2:
-                raise ValueError("data must contain multiple values")
-            self.lambtha = float(sum(data) / len(data))
-            if self.lambtha <= 0:
-                raise ValueError("lambtha must be a positive value")
-
-    def pmf(self, k):
-        """Calculate pmf"""
-        k = int(k)
+    def factorial(self, k):
+        '''
+            Calculates the factorial
+        '''
         if k < 0:
             return 0
-        else:
-            numerator = (self.lambtha ** k) * (2.7182818285 ** (-self.lambtha))
-            denominator = self.factorial(k)
-            return numerator / denominator
-
-    def factorial(self, n):
-        """Calculate factorial"""
-        if n == 0:
+        if k == 0 or k == 1:
             return 1
+        return k * self.factorial(k - 1)
+
+    def __init__(self, data=None, lambtha=1.):
+        '''
+            Class constructor
+        '''
+        if data is None:
+            if lambtha <= 0:
+                raise ValueError('lambtha must be a positive value')
+            self.lambtha = float(lambtha)
         else:
-            return n * self.factorial(n - 1)
+            if type(data) is not list:
+                raise TypeError('data must be a list')
+            if len(data) < 2:
+                raise ValueError('data must contain multiple values')
+            self.lambtha = float(sum(data) / len(data))
 
+    def pmf(self, k):
+        '''
+            Calculates the value of the
+            PMF for a given number of successes
+        '''
+        if k < 0:
+            return 0
+        k = int(k)
+        e = 2.7182818285
+        return ((self.lambtha ** k) * (e ** (-self.lambtha))
+                ) / (self.factorial(k))
 
-# Test cases
-if __name__ == "__main__":
-    p = Poisson(data=[1, 2, 3])
-    print("{:.10f}".format(p.pmf(2)))  # Should print the PMF value for k = 2
-    print("{:.10f}".format(p.pmf(1.5)))  # Should print the PMF value for k = 1
+    def cdf(self, k):
+        '''
+            Calculates the value of the
+            CDF for a given number of successes
+        '''
+        if type(k) is not int:
+            k = int(k)
+        if k < 0:
+            return 0
+        cdf = 0
+        for i in range(k + 1):
+            cdf += self.pmf(i)
+        return cdf
