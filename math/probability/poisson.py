@@ -26,7 +26,9 @@ class Poisson:
         if k < 0:
             return 0
         else:
-            return (self.lambtha ** k) * (2.7182818285 ** (-self.lambtha)) / self.factorial(k)
+            numerator = (self.lambtha ** k) * (2.7182818285 ** (-self.lambtha))
+            denominator = self.factorial(k)
+            return numerator / denominator
 
     def factorial(self, n):
         """Calculate factorial"""
