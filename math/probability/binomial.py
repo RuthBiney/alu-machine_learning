@@ -7,14 +7,6 @@ class Binomial:
         """
         Constructor for the Binomial class.
 
-        Parameters:
-            data (list): Optional. List of data used to estimate the distribution.
-            n (int): Number of Bernoulli trials.
-            p (float): Probability of success.
-
-        Raises:
-            ValueError: If n is not a positive value or if p is not a valid probability.
-            TypeError: If data is not a list.
         """
         if data is None:
             if n < 1:
@@ -39,13 +31,8 @@ class Binomial:
 
     def pmf(self, k):
         """
-        Calculates the probability mass function (PMF) for a given number of successes k.
+        Calculates the probability mass function (PMF).
 
-        Parameters:
-            k (int): Number of successes.
-
-        Returns:
-            float: PMF value for k.
         """
         if not isinstance(k, int):
             k = int(k)
@@ -74,11 +61,6 @@ class Binomial:
         """
         Calculates the factorial of a number x.
 
-        Parameters:
-            x (int): Number to calculate the factorial of.
-
-        Returns:
-            int: Factorial of x.
         """
         if x == 0:
             return 1
@@ -91,11 +73,6 @@ class Binomial:
         """
         Calculates the cumulative distribution function (CDF) 
 
-        Parameters:
-            k (int): Number of successes.
-
-        Returns:
-            float: CDF value for k.
         """
         if not isinstance(k, int):
             k = int(k)
