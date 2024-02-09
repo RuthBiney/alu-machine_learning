@@ -3,6 +3,8 @@
 
 
 class Binomial:
+    """Binomial distribution"""
+
     def __init__(self, data=None, n=1, p=0.5):
         """
         Constructor for the Binomial class.
@@ -71,7 +73,7 @@ class Binomial:
 
     def cdf(self, k):
         """
-        Calculates the cumulative distribution function (CDF) 
+        Calculates the cumulative distribution function (CDF).
 
         """
         if not isinstance(k, int):
