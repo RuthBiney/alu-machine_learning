@@ -8,8 +8,7 @@ class Binomial:
     '''
         Binomial distribution class
     '''
-
-    def _init_(self, data=None, n=1, p=0.5):
+    def __init__(self, data=None, n=1, p=0.5):
         '''
             Class constructor
         '''
