@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""Binomial distribution"""
+
+
 class Binomial:
     def __init__(self, data=None, n=1, p=0.5):
         """
