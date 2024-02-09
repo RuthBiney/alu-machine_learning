@@ -1,7 +1,17 @@
-#!/usr/bin/env python3
-
 class Binomial:
     def __init__(self, data=None, n=1, p=0.5):
+        """
+        Constructor for the Binomial class.
+
+        Parameters:
+            data (list): Optional. List of data used to estimate the distribution.
+            n (int): Number of Bernoulli trials.
+            p (float): Probability of success.
+
+        Raises:
+            ValueError: If n is not a positive value or if p is not a valid probability.
+            TypeError: If data is not a list.
+        """
         if data is None:
             if n < 1:
                 raise ValueError("n must be a positive value")
@@ -24,6 +34,15 @@ class Binomial:
             self.p = mean / self.n
 
     def pmf(self, k):
+        """
+        Calculates the probability mass function (PMF) for a given number of successes k.
+
+        Parameters:
+            k (int): Number of successes.
+
+        Returns:
+            float: PMF value for k.
+        """
         if not isinstance(k, int):
             k = int(k)
         if k < 0:
@@ -33,12 +52,30 @@ class Binomial:
         return pmf
 
     def _binomial_coefficient(self, k):
+        """
+        Calculates the binomial coefficient (n choose k).
+
+        Parameters:
+            k (int): Number of successes.
+
+        Returns:
+            int: Binomial coefficient.
+        """
         n_fact = self._factorial(self.n)
         k_fact = self._factorial(k)
         n_minus_k_fact = self._factorial(self.n - k)
         return n_fact // (k_fact * n_minus_k_fact)
 
     def _factorial(self, x):
+        """
+        Calculates the factorial of a number x.
+
+        Parameters:
+            x (int): Number to calculate the factorial of.
+
+        Returns:
+            int: Factorial of x.
+        """
         if x == 0:
             return 1
         result = 1
@@ -47,6 +84,15 @@ class Binomial:
         return result
 
     def cdf(self, k):
+        """
+        Calculates the cumulative distribution function (CDF) 
+
+        Parameters:
+            k (int): Number of successes.
+
+        Returns:
+            float: CDF value for k.
+        """
         if not isinstance(k, int):
             k = int(k)
         if k < 0:
