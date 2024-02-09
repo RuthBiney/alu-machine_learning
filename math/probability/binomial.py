@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Binomial distribution"""
+'''
+    Binomial distribution
+'''
 
 
 class Binomial:
-    """Binomial distribution"""
+    '''
+        Binomial distribution class
+    '''
 
-    def __init__(self, data=None, n=1, p=0.5):
-        """
-        Constructor for the Binomial class.
-
-        """
+    def _init_(self, data=None, n=1, p=0.5):
+        '''
+            Class constructor
+        '''
         if data is None:
             if n < 1:
                 raise ValueError("n must be a positive value")
@@ -20,73 +23,61 @@ class Binomial:
             else:
                 self.p = p
         else:
-            if not isinstance(data, list):
+            if type(data) is not list:
                 raise TypeError('data must be a list')
             if len(data) < 2:
                 raise ValueError('data must contain multiple values')
-            mean = sum(data) / len(data)
-            variance = sum((x - mean) ** 2 for x in data) / len(data)
+            mean = float(sum(data) / len(data))
+            summation = 0
+            for x in data:
+                summation += ((x - mean) ** 2)
+            variance = (summation / len(data))
             q = variance / mean
-            p = 1 - q
-            self.n = round(mean / p)
-            self.p = mean / self.n
+            p = (1 - q)
+            n = round(mean / p)
+            p = float(mean / n)
+            self.n = n
+            self.p = p
 
     def pmf(self, k):
-        """
-        Calculates the probability mass function (PMF).
-
-        """
-        if not isinstance(k, int):
+        '''
+            Calculates the value of the
+            PMF for a given number of successes
+        '''
+        if type(k) is not int:
             k = int(k)
         if k < 0:
             return 0
-        binom_coeff = self._binomial_coefficient(k)
-        pmf = binom_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
+        p = self.p
+        n = self.n
+        q = (1 - p)
+        n_factorial = 1
+        for i in range(n):
+            n_factorial *= (i + 1)
+        k_factorial = 1
+        for i in range(k):
+            k_factorial *= (i + 1)
+        nk_factorial = 1
+        for i in range(n - k):
+            nk_factorial *= (i + 1)
+        binomial_co = n_factorial / (k_factorial * nk_factorial)
+        pmf = binomial_co * (p ** k) * (q ** (n - k))
         return pmf
 
-    def _binomial_coefficient(self, k):
-        """
-        Calculates the binomial coefficient (n choose k).
-
-        Parameters:
-            k (int): Number of successes.
-
-        Returns:
-            int: Binomial coefficient.
-        """
-        n_fact = self._factorial(self.n)
-        k_fact = self._factorial(k)
-        n_minus_k_fact = self._factorial(self.n - k)
-        return n_fact // (k_fact * n_minus_k_fact)
-
-    def _factorial(self, x):
-        """
-        Calculates the factorial of a number x.
-
-        """
-        if x == 0:
-            return 1
-        result = 1
-        for i in range(1, x + 1):
-            result *= i
-        return result
-
     def cdf(self, k):
-        """
-        Calculates the cumulative distribution function (CDF).
-
-        """
-        if not isinstance(k, int):
+        '''
+            Calculates the value of the
+            CDF for a given number of successes
+        '''
+        if type(k) is not int:
             k = int(k)
         if k < 0:
             return 0
-        cdf = sum(self.pmf(i) for i in range(k + 1))
+        p = self.p
+        n = self.n
+        q = (1 - p)
+        summation = 0
+        for i in range(k + 1):
+            summation += self.pmf(i)
+        cdf = summation
         return cdf
-
-
-# Example usage
-if __name__ == "__main__":
-    b = Binomial(data=[84, 85])
-    print(b.pmf(84))  # Expected output: 2.5827623561e-10
-    print(b.pmf(85))  # Expected output: 1.6516512762e-11
-    print(b.cdf(84))  # Expected output: 0.0990153774
