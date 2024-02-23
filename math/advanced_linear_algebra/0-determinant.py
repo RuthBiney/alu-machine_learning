@@ -3,6 +3,9 @@ def determinant(matrix):
     """
     Calculate the determinant of a square matrix.
 
+    Parameters:
+    - matrix (list of lists): The matrix whose determinant should be calculated.
+
     Returns:
     - float: The determinant of the matrix.
 
@@ -21,11 +24,10 @@ def determinant(matrix):
     # Check if the matrix is square
     num_rows = len(matrix)
     if num_rows != len(matrix[0]):
-        raise ValueError("matrix must be a square matrix")
-
-    # Base case: 0x0 matrix has determinant 1
-    if num_rows == 0:
-        return 1
+        if num_rows == 0:
+            return 1
+        else:
+            raise ValueError("matrix must be a square matrix")
 
     # Base case: 1x1 matrix has determinant equal to its only element
     if num_rows == 1:
