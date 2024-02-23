@@ -17,9 +17,7 @@ def determinant(matrix):
 
     """
     # Check if the input is a list of lists
-    if not all(isinstance(row, list) for row in matrix):
-        raise TypeError("matrix must be a list of lists")
-    if not isinstance(matrix, list):
+    if not isinstance(matrix, list) or not all(isinstance(row, list) for row in matrix):
         raise TypeError("matrix must be a list of lists")
 
     # Check if the matrix is square
@@ -41,3 +39,8 @@ def determinant(matrix):
         det += (-1) ** col * matrix[0][col] * determinant(minor)
 
     return det
+
+
+# Test your function
+mat = [[1]]
+print(determinant(mat))  # Expected output: 1
