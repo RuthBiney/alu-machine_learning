@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""class MultiNormal that represents
+    a Multivariate Normal distribution:"""
 
 import numpy as np
 
@@ -17,12 +19,12 @@ class MultiNormal:
     Methods:
     --------
     __init__(self, data)
-    Initializes the MultiNormal instance with data, calculates the mean and covariance matrix.
+    Initializes the MultiNormal instance with data, 
 
     Parameters:
     -----------
     data : numpy.ndarray
-    A 2D numpy array of shape (d, n) containing the dataset, where n is the number of data points
+    A 2D numpy array of shape (d, n) containing the dataset,
     and d is the number of dimensions in each data point.
     """
 
