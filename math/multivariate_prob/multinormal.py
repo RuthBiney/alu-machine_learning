@@ -12,18 +12,18 @@ class MultiNormal:
     mean : numpy.ndarray
         A numpy array of shape (d, 1) containing the mean of the data.
     cov : numpy.ndarray
-        A numpy array of shape (d, d) containing the covariance matrix of the data.
+    A numpy array of shape (d, d) containing the covariance matrix of the data.
 
     Methods:
     --------
     __init__(self, data)
-        Initializes the MultiNormal instance with data, calculates the mean and covariance matrix.
+    Initializes the MultiNormal instance with data, calculates the mean and covariance matrix.
 
     Parameters:
     -----------
     data : numpy.ndarray
-        A 2D numpy array of shape (d, n) containing the dataset, where n is the number of data points
-        and d is the number of dimensions in each data point.
+    A 2D numpy array of shape (d, n) containing the dataset, where n is the number of data points
+    and d is the number of dimensions in each data point.
     """
 
     def __init__(self, data):
