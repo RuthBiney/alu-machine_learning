@@ -19,7 +19,7 @@ class MultiNormal:
     Methods:
     --------
     __init__(self, data)
-    Initializes the MultiNormal instance with data, 
+    Initializes the MultiNormal instance with data.
 
     Parameters:
     -----------
