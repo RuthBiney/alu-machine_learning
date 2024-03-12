@@ -1,72 +1,62 @@
 #!/usr/bin/env python3
-"""class MultiNormal that represents
-    a Multivariate Normal distribution:"""
+"""
+    class MultiNormal that represents
+    a Multivariate Normal distribution:
+"""
+
 
 import numpy as np
 
 
 class MultiNormal:
     """
-    Represents a Multivariate Normal distribution.
-
-    Attributes:
-    -----------
-    mean : numpy.ndarray
-        A numpy array of shape (d, 1) containing the mean of the data.
-    cov : numpy.ndarray
-    A numpy array of shape (d, d) containing the covariance matrix of the data.
-
-    Methods:
-    --------
-    __init__(self, data)
-    Initializes the MultiNormal instance with data.
-
-    Parameters:
-    -----------
-    data : numpy.ndarray
-    A 2D numpy array of shape (d, n) containing the dataset,
-    and d is the number of dimensions in each data point.
+    class MultiNormal that represents
+    a Multivariate Normal distribution:
     """
 
     def __init__(self, data):
         """
-        Initializes the MultiNormal instance.
-
-        Parameters:
-        -----------
-        data : numpy.ndarray
-            The dataset to model with a Multivariate Normal distribution.
-
-        Raises:
-        -------
-        TypeError
-            If the data is not a 2D numpy.ndarray.
-        ValueError
-            If the data does not contain multiple data points (n < 2).
+        Args:
+            data is a numpy.ndarray of shape (n, d)
+            containing the data set
         """
-        # Check if data is a 2D numpy.ndarray
-        if not isinstance(data, np.ndarray) or data.ndim != 2:
+        if type(data) is not np.ndarray or len(data.shape) != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
-        # Check if data contains multiple data points
-        if data.shape[1] < 2:
+        d, n = data.shape
+        if n < 2:
             raise ValueError("data must contain multiple data points")
 
-        # Calculate the mean of the data
-        self.mean = np.mean(data, axis=1, keepdims=True)
+        self.data = data
+        mean = np.mean(data, axis=1, keepdims=True)
+        self.mean = mean
+        cov = np.matmul(data - mean, data.T - mean.T) / (n - 1)
+        self.cov = cov
 
-        # Manually compute the covariance matrix
-        centered_data = data - self.mean
-        self.cov = (centered_data @ centered_data.T) / (data.shape[1] - 1)
+    def pdf(self, x):
+        """
+        calculates the PDF at a data point
 
+        Args:
+            x is a numpy.ndarray of shape (d,) containing the data point
+                whose PDF should be calculated
+                d is the number of dimensions of the Multinomial instance
 
-# Example of how to use the MultiNormal class
-if __name__ == "__main__":
-    try:
-        # Example data
-        data = np.array([[1, 2, 3], [2, 3, 4]])
-        multi_normal = MultiNormal(data)
+        Returns:
+            the PDF at x
+        """
+        if type(x) is not np.ndarray:
+            raise TypeError("x must be a numpy.ndarray")
+        d = self.cov.shape[0]
+        if len(x.shape) != 2:
+            raise ValueError("x must have the shape ({}, 1)".format(d))
+        test_d, one = x.shape
+        if test_d != d or one != 1:
+            raise ValueError("x must have the shape ({}, 1)".format(d))
 
-        print("Mean:\n", multi_normal.mean)
-        print("Covariance Matrix:\n", multi_normal.cov)
-    except Exception as e:
-        print(e)
+        det = np.linalg.det(self.cov)
+        inv = np.linalg.inv(self.cov)
+        pdf = 1.0 / np.sqrt(((2 * np.pi) ** d) * det)
+        mult = np.matmul(np.matmul((x - self.mean).T, inv), (x - self.mean))
+        pdf *= np.exp(-0.5 * mult)
+        pdf = pdf[0][0]
+        return pdf
