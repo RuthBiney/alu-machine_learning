@@ -14,3 +14,4 @@ for i in range(100):
     plt.axis('off')
 plt.tight_layout()
 plt.show()
+ 
