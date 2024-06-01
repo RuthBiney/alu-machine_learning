@@ -21,7 +21,16 @@ def dropout_create_layer(prev, n, activation, keep_prob):
     Returns:
         - the tensor output of the new layer
     """
-    layer = tf.layers.dense(prev, n)
-    layer = activation(layer)
-    layer = tf.nn.dropout(layer, keep_prob)
+    # Initialize weights with He initialization
+    initializer = tf.contrib.layers.variance_scaling_initializer(
+        mode="FAN_AVG"
+    )
+    layer = tf.layers.Dense(
+        units=n, activation=activation, kernel_initializer=initializer
+    )
+    output = layer(prev)
+
+    # Apply dropout
+    layer = tf.layers.dropout(output, rate=1 - keep_prob)
+
     return layer
