@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import requests
+"""Fetches and returns a list of starships from the SWAPI"""
 
 def availableShips(passengerCount):
     """
