@@ -1,37 +1,40 @@
 #!/usr/bin/env python3
+"""
+    method that returns the list of ships
+    that can hold a given number of passengers:
+"""
+
+
 import requests
-"""Fetches and returns a list of starships from the SWAPI"""
+
 
 def availableShips(passengerCount):
     """
-    Fetches and returns a list of starships from the SWAPI that can hold at least the given number of passengers.
+    method that returns the list of ships
+    that can hold a given number of passengers:
 
     Args:
-        passengerCount (int): The minimum number of passengers the ship must be able to hold.
-
+        passengerCount (int): number of passengers
+        to be transported
+        Add pagination to the data
     Returns:
-        list: A list of starship names that can hold at least the given number of passengers. If no ship is available, returns an empty list.
+        list of ships that can hold the given
     """
+
+    url = "https://swapi-api.alx-tools.com/api/starships/"
     ships = []
-    url = 'https://swapi.dev/api/starships/'
-    
     while url:
         response = requests.get(url)
         data = response.json()
-        
-        for ship in data['results']:
-            # Clean the passengers field to handle large numbers with commas
-            passengers = ship['passengers'].replace(',', '')
-            
-            # Check if the passengers field is a digit and if it meets the passenger count requirement
-            if passengers.isdigit() and int(passengers) >= passengerCount:
-                ships.append(ship['name'])
-        
-        # Move to the next page, if available
-        url = data['next']
-    
+        for ship in data["results"]:
+            if (
+                ship["passengers"] != "n/a"
+                and ship["passengers"] != "unknown"
+                and ship["passengers"] != "0"
+                and ship["passengers"] != "none"
+            ):
+                ship["passengers"] = ship["passengers"].replace(",", "")
+                if int(ship["passengers"]) >= passengerCount:
+                    ships.append(ship["name"])
+        url = data["next"]
     return ships
-
-# Example usage:
-if __name__ == "__main__":
-    print(availableShips(100))
