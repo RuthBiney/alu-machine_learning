@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Upcoming Launches
+    Script that displays the upcoming launch
 '''
 
 
@@ -11,17 +11,24 @@ import datetime
 def get_upcoming_launch():
     '''
     Prints upcoming SpaceX launch
+
+    Output info:
+    - Name of the launch
+    - The date (in local time)
+    - The rocket name
+    - The name (with the locality) of the launchpad
     '''
+
     url = 'https://api.spacexdata.com/v4/launches/upcoming'
     try:
         response = requests.get(url)
         response.raise_for_status()
         launches = response.json()
 
-        # Sort launches by date_unix to get the soonest one
+        # Sort dict using date_unix
         upcoming_launch = sorted(launches, key=lambda x: x['date_unix'])[0]
 
-        # Get rocket details
+        # Rocket details
         rocket_id = upcoming_launch['rocket']
         rocket_url = 'https://api.spacexdata.com/v4/rockets/{}'.format(
             rocket_id)
@@ -30,7 +37,7 @@ def get_upcoming_launch():
         rocket = rocket_response.json()
         rocket_name = rocket['name']
 
-        # Get launchpad details
+        # Launchpad details
         launchpad_id = upcoming_launch['launchpad']
         launchpad_url = 'https://api.spacexdata.com/v4/launchpads/{}'.format(
             launchpad_id)
@@ -39,11 +46,9 @@ def get_upcoming_launch():
         launchpad = launchpad_response.json()
         launchpad_name = launchpad['name']
         launchpad_locality = launchpad['locality']
-    
-        # Use the date_local directly
+
         date_local = upcoming_launch['date_local']
 
-        # Print launch details in the required format
         print(
             "{} ({}) {} - {} ({})".format(
                 upcoming_launch['name'], date_local, rocket_name,
