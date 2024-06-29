@@ -1,37 +1,48 @@
 #!/usr/bin/env python3
-"""
-    Return the list of names of the home
-    planets of all sentient species.
-"""
+'''
+Prints the location of a user
+'''
 
 
+import sys
 import requests
+import time
 
 
-def sentientPlanets():
+def get_user_location(api_url):
     """
-    Return the list of names of the home
-    planets of all sentient species.
+    Fetch and print the location of a GitHub user.
+
+    :param api_url: The API URL for the user
     """
-    url = "https://swapi-api.alx-tools.com/api/species/"
-    sentient_planets = []
-    sentient_classifications = ["sentient"]
+    try:
+        response = requests.get(api_url)
 
-    while url:
-        response = requests.get(url)
-        data = response.json()
+        if response.status_code == 200:
+            user_data = response.json()
+            location = user_data.get('location')
+            if location:
+                print(location)
+            else:
+                print('Location not available')
+        elif response.status_code == 404:
+            print('Not found')
+        elif response.status_code == 403:
+            reset_time = int(
+                response.headers.get('X-RateLimit-Reset', time.time()))
+            current_time = int(time.time())
+            wait_time = (reset_time - current_time) // 60
+            print('Reset in {} min'.format(wait_time))
+        else:
+            print('Error: {}'.format(response.status_code))
+    except requests.RequestException as e:
+        print('An error occurred: {}'.format(e))
 
-        for species in data["results"]:
-            if (
-                species["classification"].lower() in sentient_classifications
-                and species["homeworld"]
-            ):
-                homeworld_url = species["homeworld"]
-                homeworld_response = requests.get(homeworld_url)
-                homeworld_data = homeworld_response.json()
-                sentient_planets.append(homeworld_data["name"])
 
-        url = data["next"]
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: ./2-user_location.py <api_url>')
+        sys.exit(1)
 
-    return sentient_planets
-
+    api_url = sys.argv[1]
+    get_user_location(api_url)
