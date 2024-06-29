@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 '''
-Script that displays the upcoming launch
+    Script that displays the upcoming launch
 '''
+
 
 import requests
 import datetime
+
 
 def get_upcoming_launch():
     '''
@@ -23,37 +25,40 @@ def get_upcoming_launch():
         response.raise_for_status()
         launches = response.json()
 
-        # Sort launches by date_unix and get the upcoming launch
+        # Sort dict using date_unix
         upcoming_launch = sorted(launches, key=lambda x: x['date_unix'])[0]
 
-        # Fetch rocket details
+        # Rocket details
         rocket_id = upcoming_launch['rocket']
-        rocket_url = f'https://api.spacexdata.com/v4/rockets/{rocket_id}'
+        rocket_url = 'https://api.spacexdata.com/v4/rockets/{}'.format(
+            rocket_id)
         rocket_response = requests.get(rocket_url)
         rocket_response.raise_for_status()
         rocket = rocket_response.json()
         rocket_name = rocket['name']
 
-        # Fetch launchpad details
+        # Launchpad details
         launchpad_id = upcoming_launch['launchpad']
-        launchpad_url = f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}'
+        launchpad_url = 'https://api.spacexdata.com/v4/launchpads/{}'.format(
+            launchpad_id)
         launchpad_response = requests.get(launchpad_url)
         launchpad_response.raise_for_status()
         launchpad = launchpad_response.json()
         launchpad_name = launchpad['name']
         launchpad_locality = launchpad['locality']
 
-        # Format the date in local time
         date_local = upcoming_launch['date_local']
-        formatted_date_local = datetime.datetime.fromisoformat(date_local).strftime('%Y-%m-%d %H:%M:%S')
 
-        # Print the details
-        print(f"{upcoming_launch['name']} ({formatted_date_local}) {rocket_name} - {launchpad_name} ({launchpad_locality})")
+        print(
+            "{} ({}) {} - {} ({})".format(
+                upcoming_launch['name'], date_local, rocket_name,
+                launchpad_name, launchpad_locality))
 
     except requests.RequestException as e:
-        print(f'An error occurred while making an API request: {e}')
+        print('An error occurred while making an API request: {}'.format(e))
     except Exception as err:
-        print(f'A general error occurred: {err}')
+        print('A general error occurred: {}'.format(err))
+
 
 if __name__ == '__main__':
     get_upcoming_launch()
