@@ -1,42 +1,64 @@
 #!/usr/bin/env python3
-"""
-This module retrieves information about the upcoming SpaceX launch.
-"""
+'''
+    Script that displays the upcoming launch
+'''
+
+
 import requests
-from datetime import datetime, timezone
+import datetime
 
 
-def sentientPlanets():
-    """
-    Retrieves information about the upcoming SpaceX launch.
-    """
+def get_upcoming_launch():
+    '''
+    Prints upcoming SpaceX launch
+
+    Output info:
+    - Name of the launch
+    - The date (in local time)
+    - The rocket name
+    - The name (with the locality) of the launchpad
+    '''
+
+    url = 'https://api.spacexdata.com/v4/launches/upcoming'
     try:
-        species_response = requests.get('https://api.spacexdata.com/v4/launches/upcoming')
-        if species_response.status_code == 200:
-            upcoming_launches = species_response.json()
-            next_launch = sorted(upcoming_launches, key=lambda x: x['date_unix'])[0]
+        response = requests.get(url)
+        response.raise_for_status()
+        launches = response.json()
 
-            launch_name = next_launch['name']
-            launch_date_utc = datetime.fromtimestamp(next_launch['date_unix'], timezone.utc)
-            launch_date_local = launch_date_utc.astimezone().strftime('%Y-%m-%d %H:%M:%S')
-            
-            launchpad_id = next_launch['launchpad']
-            launchpad_details = requests.get(f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}')
-            launchpad_data = launchpad_details.json()
-            launchpad_name = launchpad_data.get('name', 'Unknown launchpad')
-            launchpad_location = launchpad_data.get('locality', 'Unknown locality')
+        # Sort dict using date_unix
+        upcoming_launch = sorted(launches, key=lambda x: x['date_unix'])[0]
 
-            rocket_details = requests.get(f'https://api.spacexdata.com/v4/rockets/{rocket_id}')
-            rocket_name = rocket_details.json().get('name', 'Unknown rocket')
-            rocket_id = next_launch['rocket']
+        # Rocket details
+        rocket_id = upcoming_launch['rocket']
+        rocket_url = 'https://api.spacexdata.com/v4/rockets/{}'.format(
+            rocket_id)
+        rocket_response = requests.get(rocket_url)
+        rocket_response.raise_for_status()
+        rocket = rocket_response.json()
+        rocket_name = rocket['name']
 
+        # Launchpad details
+        launchpad_id = upcoming_launch['launchpad']
+        launchpad_url = 'https://api.spacexdata.com/v4/launchpads/{}'.format(
+            launchpad_id)
+        launchpad_response = requests.get(launchpad_url)
+        launchpad_response.raise_for_status()
+        launchpad = launchpad_response.json()
+        launchpad_name = launchpad['name']
+        launchpad_locality = launchpad['locality']
 
+        date_local = upcoming_launch['date_local']
 
-            print(f'{launch_name} ({launch_date_local}) {rocket_name} - {launchpad_name} ({launchpad_location})')
-        else:
-            print(f'Error: {species_response.status_code}')
-    except requests.exceptions.RequestException as error:
-        print(f'Request failed: {error}')
+        print(
+            "{} ({}) {} - {} ({})".format(
+                upcoming_launch['name'], date_local, rocket_name,
+                launchpad_name, launchpad_locality))
+
+    except requests.RequestException as e:
+        print('An error occurred while making an API request: {}'.format(e))
+    except Exception as err:
+        print('A general error occurred: {}'.format(err))
+
 
 if __name__ == '__main__':
-    sentientPlanets()
+    get_upcoming_launch()
