@@ -1,48 +1,41 @@
 #!/usr/bin/env python3
-'''
-Prints the location of a user
-'''
+"""
+    script that prints the location of a specific user:
+"""
 
 
-import sys
 import requests
 import time
+from datetime import datetime
 
 
-def get_user_location(api_url):
+def main(url):
     """
-    Fetch and print the location of a GitHub user.
+    - The user is passed as first argument of the script
+    with the full API URL, example: ./2-user_location.py
+    https://api.github.com/users/holbertonschool
+    - If the user doesn’t exist, print Not found
+    - If the status code is 403, print Reset in X min where X
+    is the number of minutes from now and the value of
+    X-Ratelimit-Reset
+    - Your code should not be executed when the file is
+    imported (you should use if __name__ == '__main__':)
 
-    :param api_url: The API URL for the user
     """
-    try:
-        response = requests.get(api_url)
+    response = requests.get(url)
 
-        if response.status_code == 200:
-            user_data = response.json()
-            location = user_data.get('location')
-            if location:
-                print(location)
-            else:
-                print('Location not available')
-        elif response.status_code == 404:
-            print('Not found')
-        elif response.status_code == 403:
-            reset_time = int(
-                response.headers.get('X-RateLimit-Reset', time.time()))
-            current_time = int(time.time())
-            wait_time = (reset_time - current_time) // 60
-            print('Reset in {} min'.format(wait_time))
-        else:
-            print('Error: {}'.format(response.status_code))
-    except requests.RequestException as e:
-        print('An error occurred: {}'.format(e))
+    if response.status_code == 404:
+        print("Not found")
+    elif response.status_code == 403:
+        reset_timestamp = int(response.headers["X-Ratelimit-Reset"])
+        current_timestamp = int(time.time())
+        reset_in_minutes = (reset_timestamp - current_timestamp) // 60
+        print("Reset in {} min".format(reset_in_minutes))
+    else:
+        print(response.json()["location"])
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: ./2-user_location.py <api_url>')
-        sys.exit(1)
+if __name__ == "__main__":
+    import sys
 
-    api_url = sys.argv[1]
-    get_user_location(api_url)
+    main(sys.argv[1])
