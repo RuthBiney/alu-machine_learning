@@ -1,36 +1,48 @@
 #!/usr/bin/env python3
-"""
-    Return the list of names of the home
-    planets of all sentient species.
-"""
+'''
+Create a method that returns a list of
+names of home planets of all sentient
+species
+'''
 
 
 import requests
 
 
 def sentientPlanets():
-    """
-    Return the list of names of the home
-    planets of all sentient species.
-    """
-    url = "https://swapi-api.alx-tools.com/api/species/"
-    sentient_planets = []
-    sentient_classifications = ["sentient"]
+    '''
+    Returns home planet list for
+    sentient species
+    '''
 
-    while url:
-        response = requests.get(url)
-        data = response.json()
+    planets = []
 
-        for species in data["results"]:
-            if (
-                species["classification"].lower() in sentient_classifications
-                and species["homeworld"]
-            ):
-                homeworld_url = species["homeworld"]
-                homeworld_response = requests.get(homeworld_url)
-                homeworld_data = homeworld_response.json()
-                sentient_planets.append(homeworld_data["name"])
+    try:
+        url = "https://swapi-api.alx-tools.com/api/species/"
 
-        url = data["next"]
+        while url:
+            response = requests.get(url)
 
-    return sentient_planets
+            data = response.json()
+            species = data['results']
+
+            for specie in species:
+                if (
+                    specie['designation'] == 'sentient'
+                    or specie['classification'] == 'sentient'
+                ):
+                    homeworld_url = specie['homeworld']
+                    if homeworld_url:
+                        homeworld_response = requests.get(homeworld_url)
+                        homeworld_response.raise_for_status()
+                        homeworld_data = homeworld_response.json()
+                        planets.append(homeworld_data['name'])
+
+            url = data.get('next')
+
+        return planets
+
+    except requests.RequestException as e:
+        print('An error occured: {}'.format(e))
+    except Exception as err:
+        print('A general error: {}'.format(err))
