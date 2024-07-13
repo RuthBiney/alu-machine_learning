@@ -23,3 +23,4 @@ if __name__ == "__main__":
     filter_path = {"method": "GET", "path": "/status"}
     path_count = logs_coll.count_documents(filter_path)
     print("{} status check".format(path_count))
+    
