@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.applications import VGG19
-from tensorflow.keras.models import Model
+
 
 class NST:
     def __init__(self, style_image, content_image, alpha=1e4, beta=1, var=10):
