@@ -2,7 +2,6 @@
 import numpy as np
 import tensorflow as tf
 
-
 class NST:
     def __init__(self, style_image, content_image, alpha=1e4, beta=1, var=10):
         if not isinstance(style_image, np.ndarray) or style_image.shape[-1] != 3:
@@ -37,13 +36,13 @@ class NST:
         return image
 
     def load_model(self):
-        vgg = VGG19(include_top=False, weights='imagenet')
+        vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
         vgg.trainable = False
         style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1', 'block5_conv1']
         content_layers = ['block5_conv2']
         selected_layers = style_layers + content_layers
         outputs = [vgg.get_layer(name).output for name in selected_layers]
-        model = Model([vgg.input], outputs)
+        model = tf.keras.Model([vgg.input], outputs)
         return model
 
     def gram_matrix(self, input_tensor):
@@ -66,7 +65,9 @@ class NST:
     def variational_cost(generated_image):
         x_deltas = generated_image[:, 1:, :, :] - generated_image[:, :-1, :, :]
         y_deltas = generated_image[:, :, 1:, :] - generated_image[:, :, :-1, :]
-        return tf.reduce_sum(tf.abs(x_deltas)) + tf.reduce_sum(tf.abs(y_deltas))
+        var_cost = tf.reduce_sum(tf.abs(x_deltas)) + tf.reduce_sum(tf.abs(y_deltas))
+        print("Variational Cost:", var_cost)  # Debugging line
+        return var_cost
 
     def total_cost(self, generated_image):
         generated_outputs = self.model(generated_image)
@@ -74,16 +75,20 @@ class NST:
         generated_content_output = generated_outputs[-1]
 
         J_content = self.alpha * tf.reduce_mean(tf.square(generated_content_output - self.content_feature))
+        print("Content Cost:", J_content)  # Debugging line
 
         J_style = 0
         for gram_style, generated_style in zip(self.gram_style_features, generated_style_outputs):
             gram_generated_style = self.gram_matrix(generated_style)
             J_style += tf.reduce_mean(tf.square(gram_generated_style - gram_style))
         J_style *= self.beta
+        print("Style Cost:", J_style)  # Debugging line
 
         J_var = self.var * self.variational_cost(generated_image)
+        print("Total Variational Cost:", J_var)  # Debugging line
 
         J_total = J_content + J_style + J_var
+        print("Total Cost:", J_total)  # Debugging line
 
         return J_total, J_content, J_style, J_var
 
