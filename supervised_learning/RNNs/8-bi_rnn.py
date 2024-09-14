@@ -7,43 +7,36 @@
 
 import numpy as np
 
+
 def bi_rnn(bi_cell, X, h_0, h_T):
     '''
         Function that performs forward propagation for a bidirectional RNN
 
         parameters:
             bi_cell: an instance of BidirectionalCell
-            X: input data of shape (t, m, i)
-            h_0: initial hidden state of shape (m, h) for the forward direction
-            h_T: terminal hidden state of shape (m, h) for the backward direction
+            X: data
+            h_0: initial hidden state
+            h_T: terminal hidden state
 
         return:
             H: all hidden states
             Y: all outputs
     '''
 
-    t, m, i = X.shape  # t = time steps, m = batch size, i = input size
-    h = h_0.shape[1]   # h = hidden state size
-
-    # Initialize H with zeros: (t + 1, 2, m, h) -> t+1 time steps, 2 directions, batch size, hidden size
+    t, m, i = X.shape
+    l, m, h = h_0.shape
     H = np.zeros((t + 1, 2, m, h))
-
-    # Set the initial hidden states for both directions
-    H[0, 0] = h_0  # Forward direction
-    H[-1, 1] = h_T  # Backward direction
-
-    # Forward direction (left to right)
+    H[0, 0] = h_0
+    H[0, 1] = h_T
     for step in range(t):
-        H[step + 1, 0] = bi_cell.forward(H[step, 0], X[step])
-
-    # Backward direction (right to left)
-    for step in reversed(range(t)):
-        H[step, 1] = bi_cell.backward(H[step + 1, 1], X[step])
-
-    # Concatenate forward and backward hidden states
-    H_concat = np.concatenate((H[1:, 0], H[:-1, 1]), axis=-1)  # (t, m, 2h)
-
-    # Generate outputs using the concatenated hidden states
-    Y = np.array([bi_cell.output(H_concat[step]) for step in range(t)])
-
-    return H, Y
+        h_prev, y = bi_cell.forward(H[step, 0], X[step])
+        H[step + 1, 0] = h_prev
+        h_next, y = bi_cell.forward(H[step, 1], y)
+        H[step + 1, 1] = h_next
+        if step == 0:
+            Y = y
+        else:
+            Y = np.concatenate((Y, y))
+    output_shape = Y.shape[-1]
+    Y = Y.reshape(t, 2, m, output_shape)
+    return (H, Y)
