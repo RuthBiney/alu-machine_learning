@@ -13,9 +13,9 @@ def bi_rnn(bi_cell, X, h_0, h_T):
 
         parameters:
             bi_cell: an instance of BidirectionalCell
-            X: data input of shape (t, m, i)
-            h_0: initial hidden state of shape (m, h)
-            h_T: terminal hidden state of shape (m, h)
+            X: input data of shape (t, m, i)
+            h_0: initial hidden state of shape (m, h) for the forward direction
+            h_T: terminal hidden state of shape (m, h) for the backward direction
 
         return:
             H: all hidden states
@@ -40,7 +40,10 @@ def bi_rnn(bi_cell, X, h_0, h_T):
     for step in reversed(range(t)):
         H[step, 1] = bi_cell.backward(H[step + 1, 1], X[step])
 
-    # Outputs for all time steps
-    Y = bi_cell.output(H[1:, 0], H[:-1, 1])
+    # Concatenate forward and backward hidden states
+    H_concat = np.concatenate((H[1:, 0], H[:-1, 1]), axis=-1)  # (t, m, 2h)
+
+    # Generate outputs using the concatenated hidden states
+    Y = np.array([bi_cell.output(H_concat[step]) for step in range(t)])
 
     return H, Y
