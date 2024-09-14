@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+'''
+    Script that defines a function def bi_rnn(bi_cell, X, h_0, h_t):
+    that performs forward propagation for a bidirectional RNN:
+'''
+
+
 import numpy as np
 
 def bi_rnn(bi_cell, X, h_0, h_T):
