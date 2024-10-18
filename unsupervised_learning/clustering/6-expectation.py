@@ -8,10 +8,9 @@ for a Gaussian Mixture Model
 import numpy as np
 pdf = __import__('5-pdf').pdf
 
-
 def expectation(X, pi, m, S):
     """
-    Calculates the expectation step in the EM algorithm for a GMM
+    Calculates the expectation step in the EM algorithm for a GMM.
 
     parameters:
         X [numpy.ndarray of shape (n, d)]:
@@ -21,7 +20,7 @@ def expectation(X, pi, m, S):
         pi [numpy.ndarray of shape (k,)]:
             contains the priors for each cluster
         m [numpy.ndarray of shape (k, d)]:
-            contains the centroid means for each clustern
+            contains the centroid means for each cluster
         S [numpy.ndarray of shape (k, d, d)]:
             contains the covariance matrices for each cluster
 
@@ -36,4 +35,31 @@ def expectation(X, pi, m, S):
                 total log likelihood
         or None, None on failure
     """
-    return None, None
+    try:
+        n, d = X.shape  # number of data points and dimensions
+        k = pi.shape[0]  # number of clusters
+        
+        # Initialize g to store posterior probabilities
+        g = np.zeros((k, n))
+
+        # Compute the posterior probabilities using the priors, means, and covariance matrices
+        for i in range(k):
+            g[i] = pi[i] * pdf(X, m[i], S[i])
+
+        # Sum across clusters for normalization
+        g_sum = np.sum(g, axis=0)
+
+        # Check for zero values to avoid division by zero
+        if np.any(g_sum == 0):
+            return None, None
+        
+        # Normalize to get the posterior probabilities
+        g /= g_sum
+
+        # Calculate the total log likelihood
+        log_likelihood = np.sum(np.log(g_sum))
+        
+        return g, log_likelihood
+    
+    except Exception as e:
+        return None, None
