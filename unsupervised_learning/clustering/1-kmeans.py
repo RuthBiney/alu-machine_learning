@@ -60,3 +60,4 @@ def kmeans(X, k, iterations=1000):
         return C, clss
     saved_centroids = np.copy(C)
     return C, clss
+
