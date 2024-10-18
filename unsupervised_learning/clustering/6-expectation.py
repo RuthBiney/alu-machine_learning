@@ -23,27 +23,27 @@ def expectation(X, pi, m, S):
     - None, None on failure.
     """
     try:
-        n, d = X.shape  # number of data points and dimensions
-        k = pi.shape[0]  # number of clusters
+        n, d = X.shape
+        k = pi.shape[0]
         
-        # Initialize the responsibility matrix (posterior probabilities)
+        # Initialize g to store posterior probabilities
         g = np.zeros((k, n))
-        
-        # Calculate the likelihood for each cluster and each data point
+
+        # Compute the posterior probabilities and the likelihood using a single loop
         for i in range(k):
-            g[i, :] = pi[i] * pdf(X, m[i], S[i])
-        
-        # Compute the total likelihood for each data point (denominator for normalizing)
+            g[i] = pi[i] * pdf(X, m[i], S[i])
+
+        # Sum across clusters for normalization
         g_sum = np.sum(g, axis=0)
-        
+
         # Check for zero values to avoid division by zero
         if np.any(g_sum == 0):
             return None, None
         
-        # Normalize the responsibilities (posterior probabilities)
+        # Normalize to get the posterior probabilities
         g /= g_sum
-        
-        # Compute the total log likelihood
+
+        # Calculate the total log likelihood
         log_likelihood = np.sum(np.log(g_sum))
         
         return g, log_likelihood
