@@ -5,7 +5,7 @@ for a Gaussian Mixture Model
 """
 
 import numpy as np
-from 5_pdf import pdf
+pdf = __import__('5-pdf').pdf
 
 def expectation(X, pi, m, S):
     """
@@ -23,29 +23,30 @@ def expectation(X, pi, m, S):
     - None, None on failure.
     """
     try:
-        n, d = X.shape
-        k = pi.shape[0]
+        n, d = X.shape  # number of data points and dimensions
+        k = pi.shape[0]  # number of clusters
         
-        # Initialize the responsibilities matrix (posterior probabilities)
+        # Initialize the responsibility matrix (posterior probabilities)
         g = np.zeros((k, n))
         
-        # Compute the posterior probabilities for each cluster
+        # Calculate the likelihood for each cluster and each data point
         for i in range(k):
             g[i, :] = pi[i] * pdf(X, m[i], S[i])
         
-        # Total responsibility across clusters
+        # Compute the total likelihood for each data point (denominator for normalizing)
         g_sum = np.sum(g, axis=0)
         
-        # Avoid division by zero or near-zero values in g_sum
+        # Check for zero values to avoid division by zero
         if np.any(g_sum == 0):
             return None, None
         
-        # Normalize the responsibilities
+        # Normalize the responsibilities (posterior probabilities)
         g /= g_sum
         
-        # Calculate the log likelihood
-        l = np.sum(np.log(g_sum))
+        # Compute the total log likelihood
+        log_likelihood = np.sum(np.log(g_sum))
         
-        return g, l
-    except Exception as e:
+        return g, log_likelihood
+    
+    except Exception:
         return None, None
