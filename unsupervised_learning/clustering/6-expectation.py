@@ -33,10 +33,11 @@ def expectation(X, pi, m, S):
         n, d = X.shape
         k = pi.shape[0]
 
+        # Check if dimensions match
         if k != m.shape[0] or k != S.shape[0] or d != m.shape[1] or S.shape[1:] != (d, d):
             return None, None
 
-        # Calculate the probability density for each cluster
+        # Calculate the probability density for each cluster using vectorized operations
         g = np.zeros((k, n))
         for i in range(k):
             g[i] = pi[i] * pdf(X, m[i], S[i])
