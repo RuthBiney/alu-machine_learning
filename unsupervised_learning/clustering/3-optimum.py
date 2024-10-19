@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Testing for the optimum number of clusters"""
+"""
+Defines function that tests for the optimum number of clusters by variance
+"""
+
 
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
@@ -7,32 +10,32 @@ variance = __import__('2-variance').variance
 
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    # Validate input parameters
-    if not isinstance(kmin, int) or kmin <= 0:
-        return None, None
-    if kmax is not None and (not isinstance(kmax, int) or kmax < kmin):
-        return None, None
+    """
+    Tests for the optimum number of clusters by variance
 
-    # Set kmax to the number of data points if not provided
-    if kmax is None:
-        kmax = X.shape[0]
+    parameters:
+        X [numpy.ndarray of shape (n, d)]:
+            contains the dataset used for K-means clustering
+            n: the number of data points
+            d: the number of dimensions for each data point
+        kmin [positive int]:
+            containing the minimum number of clusters to check for (inclusive)
+        kmax [positive int]:
+            containing the maximum number of clusters to check for (inclusive)
+        iterations [positive int]:
+            containing the maximum number of iterations for K-means
 
-    # Lists to store results and variance calculations
-    results = []
-    variances = []
+    function should analyze at least 2 different cluster sizes
 
-    # Loop through each value of k from kmin to kmax
-    for k in range(kmin, kmax + 1):
-        # Perform K-means clustering
-        centroids, labels = kmeans(X, k, iterations=iterations)
-        results.append((centroids, labels))
+    should use at most 2 loops
 
-        # Calculate variance for the current k
-        current_variance = variance(X, centroids)
-        variances.append(current_variance)
-
-    # Calculate the variance differences (delta variance)
-    initial_variance = variances[0]
-    d_vars = [initial_variance - v for v in variances]
-
-    return results, d_vars
+    returns:
+        results, d_vars:
+            results [list]:
+                containing the output of K-means for each cluster size
+            d_vars [list]:
+                containing the difference in variance from the smallest cluster
+                    size for each cluster size
+        or None, None on failure
+    """
+    return None, None
