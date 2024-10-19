@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Write a function def expectation(X, pi, m, S): that calculates the expectation step in the EM algorithm for a GMM:
 
