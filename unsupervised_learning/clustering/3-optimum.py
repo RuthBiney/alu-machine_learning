@@ -7,27 +7,32 @@ variance = __import__('2-variance').variance
 
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    # Check for valid kmin and kmax
-    if not isinstance(kmin, int) or kmin <= 0 or (kmax is not None and not isinstance(kmax, int)):
+    # Validate input parameters
+    if not isinstance(kmin, int) or kmin <= 0:
         return None, None
+    if kmax is not None and (not isinstance(kmax, int) or kmax < kmin):
+        return None, None
+
+    # Set kmax to the number of data points if not provided
     if kmax is None:
         kmax = X.shape[0]
-    if kmax < kmin or kmax <= 1:
-        return None, None
 
-    # List to hold the results of K-means for each cluster size
+    # Lists to store results and variance calculations
     results = []
-    # List to hold the variance for each cluster size
     variances = []
 
-    # Initial K-means clustering and variance calculation for kmin
+    # Loop through each value of k from kmin to kmax
     for k in range(kmin, kmax + 1):
+        # Perform K-means clustering
         centroids, labels = kmeans(X, k, iterations=iterations)
         results.append((centroids, labels))
+
+        # Calculate variance for the current k
         current_variance = variance(X, centroids)
         variances.append(current_variance)
 
-    # Calculate the difference in variance from the smallest cluster size
-    d_vars = [variances[0] - v for v in variances]
+    # Calculate the variance differences (delta variance)
+    initial_variance = variances[0]
+    d_vars = [initial_variance - v for v in variances]
 
     return results, d_vars
