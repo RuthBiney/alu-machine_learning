@@ -63,7 +63,7 @@ def backward(Observations, Transition, Emission):
     return beta
 
 
-def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
+def baum_welch(Observations, Transition, Emission, Initial, iterations=1000, tol=1e-6):
     """
     Performs the Baum-Welch algorithm (an instance of the Expectation-Maximization algorithm) for a hidden Markov model (HMM).
 
@@ -73,6 +73,7 @@ def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
     - Emission (numpy.ndarray): Shape (M, N), initial emission probability matrix where N is the number of observation states.
     - Initial (numpy.ndarray): Shape (M, 1), initial state distribution.
     - iterations (int, optional): The number of iterations of the expectation-maximization process to perform. Default is 1000.
+    - tol (float, optional): The tolerance level for convergence. Default is 1e-6.
 
     Returns:
     - Transition (numpy.ndarray): The updated transition probability matrix.
@@ -83,6 +84,10 @@ def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
     N = Emission.shape[1]
 
     for iteration in range(iterations):
+        # Save previous values for convergence check
+        prev_Transition = np.copy(Transition)
+        prev_Emission = np.copy(Emission)
+
         # Expectation step (E-step)
         alpha = forward(Observations, Transition, Emission, Initial)
         beta = backward(Observations, Transition, Emission)
@@ -118,7 +123,13 @@ def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
                 Emission[i, k] = np.sum(
                     gamma[:, i] * relevant_observations) / np.sum(gamma[:, i])
 
-        # Re-estimate Initial state distribution
-        Initial = gamma[0, :].reshape((-1, 1))
+        # Ensure the transition and emission probabilities are normalized
+        Transition = Transition / np.sum(Transition, axis=1, keepdims=True)
+        Emission = Emission / np.sum(Emission, axis=1, keepdims=True)
+
+        # Check for convergence
+        if np.allclose(Transition, prev_Transition, atol=tol) and np.allclose(Emission, prev_Emission, atol=tol):
+            print(f"Converged after {iteration + 1} iterations")
+            break
 
     return Transition, Emission
