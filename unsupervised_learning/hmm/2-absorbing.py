@@ -4,7 +4,6 @@
     determines if a markov chain is absorbing
 '''
 
-
 import numpy as np
 
 
