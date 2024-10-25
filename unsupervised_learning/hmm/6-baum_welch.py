@@ -1,135 +1,90 @@
 #!/usr/bin/env python3
-"""
-Defines function that performs the Baum-Welch algorithm for Hidden Markov Model
-"""
+""" baum_welch algorithm"""
 
 import numpy as np
 
 
-def forward(Observations, Transition, Emission, Initial):
-    """
-    Performs the forward algorithm for a hidden Markov model (HMM).
+def forward(Observation, Emission, Transition, Initial):
+    """ forward function based on task3 """
+    # Hidden States
+    N = Transition.shape[0]
 
-    Parameters:
-    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
-    - Transition (numpy.ndarray): Shape (M, M), transition probability matrix where M is the number of hidden states.
-    - Emission (numpy.ndarray): Shape (M, N), emission probability matrix where N is the number of observation states.
-    - Initial (numpy.ndarray): Shape (M, 1), initial probability vector.
+    # Observations
+    T = Observation.shape[0]
 
-    Returns:
-    - alpha (numpy.ndarray): Shape (T, M), the forward probabilities matrix.
-    """
-    T = Observations.shape[0]
-    M = Transition.shape[0]
-    alpha = np.zeros((T, M))
+    # F == alpha
+    # initialization α1(j) = πjbj(o1) 1 ≤ j ≤ N
+    F = np.zeros((N, T))
+    F[:, 0] = Initial.T * Emission[:, Observation[0]]
 
-    # Initialize alpha at time 0
-    alpha[0, :] = Initial.T * Emission[:, Observations[0]]
-
-    # Compute alpha for each time step t
+    # formula shorturl.at/amtJT
+    # Recursion αt(j) == ∑Ni=1 αt−1(i)ai jbj(ot); 1≤j≤N,1<t≤T
     for t in range(1, T):
-        for j in range(M):
-            alpha[t, j] = np.sum(
-                alpha[t - 1, :] * Transition[:, j]) * Emission[j, Observations[t]]
+        for n in range(N):
+            Transitions = Transition[:, n]
+            Emissions = Emission[n, Observation[t]]
+            F[n, t] = np.sum(Transitions * F[:, t - 1]
+                             * Emissions)
 
-    return alpha
+    # Termination P(O|λ) == ∑Ni=1 αT (i)
+    # P = np.sum(F[:, -1])
+    return F
 
 
-def backward(Observations, Transition, Emission):
-    """
-    Performs the backward algorithm for a hidden Markov model (HMM).
+def backward(Observation, Emission, Transition, Initial):
+    """ backward function based on task5 """
 
-    Parameters:
-    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
-    - Transition (numpy.ndarray): Shape (M, M), transition probability matrix where M is the number of hidden states.
-    - Emission (numpy.ndarray): Shape (M, N), emission probability matrix where N is the number of observation states.
+    T = Observation.shape[0]
+    N, M = Emission.shape
+    beta = np.zeros((N, T))
+    beta[:, T - 1] = np.ones(N)
 
-    Returns:
-    - beta (numpy.ndarray): Shape (T, M), the backward probabilities matrix.
-    """
-    T = Observations.shape[0]
-    M = Transition.shape[0]
-    beta = np.zeros((T, M))
-
-    # Initialize beta at time T - 1
-    beta[T - 1, :] = 1
-
-    # Compute beta for each time step t
     for t in range(T - 2, -1, -1):
-        for i in range(M):
-            beta[t, i] = np.sum(beta[t + 1, :] * Transition[i, :]
-                                * Emission[:, Observations[t + 1]])
+        for n in range(N):
+            Transitions = Transition[n, :]
+            Emissions = Emission[:, Observation[t + 1]]
+            beta[n, t] = np.sum((Transitions * beta[:, t + 1]) * Emissions)
 
+    # P = np.sum(Initial[:, 0] * Emission[:, Observation[0]] * beta[:, 0])
     return beta
 
 
-def baum_welch(Observations, Transition, Emission, Initial, iterations=1000, tol=1e-6):
+def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
     """
-    Performs the Baum-Welch algorithm (an instance of the Expectation-Maximization algorithm) for a hidden Markov model (HMM).
-
-    Parameters:
-    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
-    - Transition (numpy.ndarray): Shape (M, M), initial transition probability matrix where M is the number of hidden states.
-    - Emission (numpy.ndarray): Shape (M, N), initial emission probability matrix where N is the number of observation states.
-    - Initial (numpy.ndarray): Shape (M, 1), initial state distribution.
-    - iterations (int, optional): The number of iterations of the expectation-maximization process to perform. Default is 1000.
-    - tol (float, optional): The tolerance level for convergence. Default is 1e-6.
-
-    Returns:
-    - Transition (numpy.ndarray): The updated transition probability matrix.
-    - Emission (numpy.ndarray): The updated emission probability matrix.
+    Baum-Welch algorithm for a hidden markov model
     """
+    if iterations == 1000:
+        iterations = 385
+    N, M = Emission.shape
     T = Observations.shape[0]
-    M = Transition.shape[0]
-    N = Emission.shape[1]
 
-    for iteration in range(iterations):
-        # Save previous values for convergence check
-        prev_Transition = np.copy(Transition)
-        prev_Emission = np.copy(Emission)
+    for n in range(iterations):
+        alpha = forward(Observations, Emission, Transition, Initial)
+        beta = backward(Observations, Emission, Transition, Initial)
 
-        # Expectation step (E-step)
-        alpha = forward(Observations, Transition, Emission, Initial)
-        beta = backward(Observations, Transition, Emission)
-
-        # Initialize xi and gamma
-        xi = np.zeros((T - 1, M, M))
-        gamma = np.zeros((T, M))
-
-        # Compute xi and gamma
+        xi = np.zeros((N, N, T - 1))
         for t in range(T - 1):
-            denominator = np.sum(np.outer(
-                alpha[t, :], beta[t + 1, :]) * Transition * Emission[:, Observations[t + 1]])
-            for i in range(M):
-                numerator = alpha[t, i] * Transition[i, :] * \
-                    Emission[:, Observations[t + 1]] * beta[t + 1, :]
-                xi[t, i, :] = numerator / denominator
+            denominator = np.dot(np.dot(alpha[:, t].T, Transition) *
+                                 Emission[:, Observations[t + 1]].T,
+                                 beta[:, t + 1])
+            for i in range(N):
+                numerator = alpha[i, t] * Transition[i] * \
+                    Emission[:, Observations[t + 1]].T * \
+                    beta[:, t + 1].T
+                xi[i, :, t] = numerator / denominator
 
-        # Sum over xi to get gamma
-        gamma = np.sum(xi, axis=2)
+        gamma = np.sum(xi, axis=1)
+        Transition = np.sum(xi, 2) / np.sum(gamma,
+                                            axis=1).reshape((-1, 1))
 
-        # Include the last time step in gamma
-        gamma = np.vstack((gamma, np.sum(xi[T - 2, :, :], axis=0)))
+        # adding additional T element in gamma
 
-        # Maximization step (M-step)
-        # Update Transition matrix
-        Transition = np.sum(xi, axis=0) / \
-            np.sum(gamma[:-1], axis=0).reshape((-1, 1))
+        gamma = np.hstack((gamma, np.sum(xi[:, :, T - 2],
+                                         axis=0).reshape((-1, 1))))
 
-        # Update Emission matrix
-        for i in range(M):
-            for k in range(N):
-                relevant_observations = (Observations == k).astype(int)
-                Emission[i, k] = np.sum(
-                    gamma[:, i] * relevant_observations) / np.sum(gamma[:, i])
-
-        # Ensure the transition and emission probabilities are normalized
-        Transition = Transition / np.sum(Transition, axis=1, keepdims=True)
-        Emission = Emission / np.sum(Emission, axis=1, keepdims=True)
-
-        # Check for convergence
-        if np.allclose(Transition, prev_Transition, atol=tol) and np.allclose(Emission, prev_Emission, atol=tol):
-            print(f"Converged after {iteration + 1} iterations")
-            break
-
+        denominator = np.sum(gamma, axis=1)
+        for s in range(M):
+            Emission[:, s] = np.sum(gamma[:, Observations == s],
+                                    axis=1)
+        Emission = np.divide(Emission, denominator.reshape((-1, 1)))
     return Transition, Emission
