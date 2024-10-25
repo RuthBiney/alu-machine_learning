@@ -31,3 +31,6 @@ def absorbing(P):
                 if P[i + 1][j] == 0 and P[i][j + 1] == 0:
                     return False
     return True
+
+
+q
