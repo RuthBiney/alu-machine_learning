@@ -7,88 +7,118 @@ import numpy as np
 
 
 def forward(Observations, Transition, Emission, Initial):
+    """
+    Performs the forward algorithm for a hidden Markov model (HMM).
+
+    Parameters:
+    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
+    - Transition (numpy.ndarray): Shape (M, M), transition probability matrix where M is the number of hidden states.
+    - Emission (numpy.ndarray): Shape (M, N), emission probability matrix where N is the number of observation states.
+    - Initial (numpy.ndarray): Shape (M, 1), initial probability vector.
+
+    Returns:
+    - alpha (numpy.ndarray): Shape (T, M), the forward probabilities matrix.
+    """
     T = Observations.shape[0]
     M = Transition.shape[0]
-    F = np.zeros((M, T))
+    alpha = np.zeros((T, M))
 
-    # Initial step
-    F[:, 0] = Initial.T * Emission[:, Observations[0]]
+    # Initialize alpha at time 0
+    alpha[0, :] = Initial.T * Emission[:, Observations[0]]
 
-    # Recursive step
+    # Compute alpha for each time step t
     for t in range(1, T):
         for j in range(M):
-            F[j, t] = np.sum(F[:, t-1] * Transition[:, j]) * \
-                Emission[j, Observations[t]]
+            alpha[t, j] = np.sum(
+                alpha[t - 1, :] * Transition[:, j]) * Emission[j, Observations[t]]
 
-    return F
+    return alpha
 
 
 def backward(Observations, Transition, Emission):
+    """
+    Performs the backward algorithm for a hidden Markov model (HMM).
+
+    Parameters:
+    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
+    - Transition (numpy.ndarray): Shape (M, M), transition probability matrix where M is the number of hidden states.
+    - Emission (numpy.ndarray): Shape (M, N), emission probability matrix where N is the number of observation states.
+
+    Returns:
+    - beta (numpy.ndarray): Shape (T, M), the backward probabilities matrix.
+    """
     T = Observations.shape[0]
     M = Transition.shape[0]
-    B = np.zeros((M, T))
+    beta = np.zeros((T, M))
 
-    # Initial step
-    B[:, T-1] = 1
+    # Initialize beta at time T - 1
+    beta[T - 1, :] = 1
 
-    # Recursive step
+    # Compute beta for each time step t
     for t in range(T - 2, -1, -1):
         for i in range(M):
-            B[i, t] = np.sum(Transition[i, :] * Emission[:,
-                             Observations[t+1]] * B[:, t+1])
+            beta[t, i] = np.sum(beta[t + 1, :] * Transition[i, :]
+                                * Emission[:, Observations[t + 1]])
 
-    return B
+    return beta
 
 
 def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
+    """
+    Performs the Baum-Welch algorithm (an instance of the Expectation-Maximization algorithm) for a hidden Markov model (HMM).
+
+    Parameters:
+    - Observations (numpy.ndarray): Shape (T,), index of the observations where T is the number of observations.
+    - Transition (numpy.ndarray): Shape (M, M), initial transition probability matrix where M is the number of hidden states.
+    - Emission (numpy.ndarray): Shape (M, N), initial emission probability matrix where N is the number of observation states.
+    - Initial (numpy.ndarray): Shape (M, 1), initial state distribution.
+    - iterations (int, optional): The number of iterations of the expectation-maximization process to perform. Default is 1000.
+
+    Returns:
+    - Transition (numpy.ndarray): The updated transition probability matrix.
+    - Emission (numpy.ndarray): The updated emission probability matrix.
+    """
     T = Observations.shape[0]
     M = Transition.shape[0]
     N = Emission.shape[1]
 
-    for n in range(iterations):
-        # E-step: Forward and Backward calculations
-        F = forward(Observations, Transition, Emission, Initial)
-        B = backward(Observations, Transition, Emission)
+    for iteration in range(iterations):
+        # Expectation step (E-step)
+        alpha = forward(Observations, Transition, Emission, Initial)
+        beta = backward(Observations, Transition, Emission)
 
-        # Calculate gamma and xi
-        gamma = np.zeros((M, T))
-        xi = np.zeros((M, M, T - 1))
+        # Initialize xi and gamma
+        xi = np.zeros((T - 1, M, M))
+        gamma = np.zeros((T, M))
 
+        # Compute xi and gamma
         for t in range(T - 1):
-            denom = np.sum(F[:, t] * B[:, t])
+            denominator = np.sum(np.outer(
+                alpha[t, :], beta[t + 1, :]) * Transition * Emission[:, Observations[t + 1]])
             for i in range(M):
-                gamma[i, t] = F[i, t] * B[i, t] / denom
-                xi[i, :, t] = F[i, t] * Transition[i, :] * \
-                    Emission[:, Observations[t+1]] * B[:, t+1] / denom
+                numerator = alpha[t, i] * Transition[i, :] * \
+                    Emission[:, Observations[t + 1]] * beta[t + 1, :]
+                xi[t, i, :] = numerator / denominator
 
-        # Last gamma for T-1
-        gamma[:, T-1] = F[:, T-1] * B[:, T-1] / np.sum(F[:, T-1] * B[:, T-1])
+        # Sum over xi to get gamma
+        gamma = np.sum(xi, axis=2)
 
-        # M-step: Update Transition and Emission matrices
-        Transition = np.sum(xi, axis=2) / \
-            np.sum(gamma[:, :-1], axis=1).reshape((-1, 1))
+        # Include the last time step in gamma
+        gamma = np.vstack((gamma, np.sum(xi[T - 2, :, :], axis=0)))
 
-        for j in range(N):
-            mask = (Observations == j)
-            Emission[:, j] = np.sum(
-                gamma[:, mask], axis=1) / np.sum(gamma, axis=1)
+        # Maximization step (M-step)
+        # Update Transition matrix
+        Transition = np.sum(xi, axis=0) / \
+            np.sum(gamma[:-1], axis=0).reshape((-1, 1))
+
+        # Update Emission matrix
+        for i in range(M):
+            for k in range(N):
+                relevant_observations = (Observations == k).astype(int)
+                Emission[i, k] = np.sum(
+                    gamma[:, i] * relevant_observations) / np.sum(gamma[:, i])
+
+        # Re-estimate Initial state distribution
+        Initial = gamma[0, :].reshape((-1, 1))
 
     return Transition, Emission
-
-
-# Example usage:
-Observations = np.array([0, 1, 0, 2, 1])  # Example observation sequence
-Transition = np.array([[0.7, 0.3], [0.4, 0.6]])  # Example transition matrix
-Emission = np.array([[0.5, 0.4, 0.1], [0.1, 0.3, 0.6]]
-                    )  # Example emission matrix
-Initial = np.array([[0.6], [0.4]])  # Example initial probabilities
-
-# Run Baum-Welch algorithm
-Transition, Emission = baum_welch(
-    Observations, Transition, Emission, Initial, iterations=10)
-
-print("Updated Transition Matrix:")
-print(np.round(Transition, 2))
-
-print("Updated Emission Matrix:")
-print(np.round(Emission, 2))
