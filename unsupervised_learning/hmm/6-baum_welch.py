@@ -6,60 +6,89 @@ Defines function that performs the Baum-Welch algorithm for Hidden Markov Model
 import numpy as np
 
 
-def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
-    """
-    Performs the Baum-Welch algorithm for a Hidden Markov Model
-
-    parameters:
-        Observations [numpy.ndarray of shape (T,)]:
-            contains the index of the observation
-            T: number of observations
-        Transition [2D numpy.ndarray of shape (M, M)]:
-            contains the initialized transition probabilities
-            M: the number of hidden states
-        Emission [numpy.ndarray of shape (M, N)]:
-            contains the initialized emission probabilities
-            N: number of output states
-        Initial [numpy.ndarray of shape (M, 1)]:
-            contains the initialized starting probabilities
-        iterations [positive int]:
-            the number of times expectation-maximization should be performed
-
-    returns:
-        the converged Transition, Emission
-        or None, None on failure
-    """
-    # Check that Observations is the correct type and dimension
-    if type(Observations) is not np.ndarray or len(Observations.shape) < 1:
-        return None, None
-    # Save T from Observations' shape
+def forward(Observations, Transition, Emission, Initial):
     T = Observations.shape[0]
-    # Check that Transition is the correct type and dimension
-    if type(Transition) is not np.ndarray or len(Transition.shape) != 2:
-        return None, None
-    # Save M and check that Transition is square
-    M, M_check = Transition.shape
-    if M != M_check:
-        return None, None
-    # Check that Emission is the correct type and dimension
-    if type(Emission) is not np.ndarray or len(Emission.shape) != 2:
-        return None, None
-    # Check that Emission's dimension matches N from Transition and save N
-    M_check, N = Emission.shape
-    if M_check != M:
-        return None, None
-    # Check that Initial is the correct type and dimension
-    if type(Initial) is not np.ndarray or len(Initial.shape) != 2:
-        return None, None
-    # Check that Initial's dimensions match (M, 1)
-    M_check, one = Initial.shape
-    if M_check != M or one != 1:
-        return None, None
-    # Check that iterations is a positive int
-    if type(iterations) is not int or iterations < 1:
-        return None, None
+    M = Transition.shape[0]
+    F = np.zeros((M, T))
 
-    # Baum-Welch algorithm implementation continues here
+    # Initial step
+    F[:, 0] = Initial.T * Emission[:, Observations[0]]
 
-    # For now, let's return None, None as a placeholder
-    return None, None
+    # Recursive step
+    for t in range(1, T):
+        for j in range(M):
+            F[j, t] = np.sum(F[:, t-1] * Transition[:, j]) * \
+                Emission[j, Observations[t]]
+
+    return F
+
+
+def backward(Observations, Transition, Emission):
+    T = Observations.shape[0]
+    M = Transition.shape[0]
+    B = np.zeros((M, T))
+
+    # Initial step
+    B[:, T-1] = 1
+
+    # Recursive step
+    for t in range(T - 2, -1, -1):
+        for i in range(M):
+            B[i, t] = np.sum(Transition[i, :] * Emission[:,
+                             Observations[t+1]] * B[:, t+1])
+
+    return B
+
+
+def baum_welch(Observations, Transition, Emission, Initial, iterations=1000):
+    T = Observations.shape[0]
+    M = Transition.shape[0]
+    N = Emission.shape[1]
+
+    for n in range(iterations):
+        # E-step: Forward and Backward calculations
+        F = forward(Observations, Transition, Emission, Initial)
+        B = backward(Observations, Transition, Emission)
+
+        # Calculate gamma and xi
+        gamma = np.zeros((M, T))
+        xi = np.zeros((M, M, T - 1))
+
+        for t in range(T - 1):
+            denom = np.sum(F[:, t] * B[:, t])
+            for i in range(M):
+                gamma[i, t] = F[i, t] * B[i, t] / denom
+                xi[i, :, t] = F[i, t] * Transition[i, :] * \
+                    Emission[:, Observations[t+1]] * B[:, t+1] / denom
+
+        # Last gamma for T-1
+        gamma[:, T-1] = F[:, T-1] * B[:, T-1] / np.sum(F[:, T-1] * B[:, T-1])
+
+        # M-step: Update Transition and Emission matrices
+        Transition = np.sum(xi, axis=2) / \
+            np.sum(gamma[:, :-1], axis=1).reshape((-1, 1))
+
+        for j in range(N):
+            mask = (Observations == j)
+            Emission[:, j] = np.sum(
+                gamma[:, mask], axis=1) / np.sum(gamma, axis=1)
+
+    return Transition, Emission
+
+
+# Example usage:
+Observations = np.array([0, 1, 0, 2, 1])  # Example observation sequence
+Transition = np.array([[0.7, 0.3], [0.4, 0.6]])  # Example transition matrix
+Emission = np.array([[0.5, 0.4, 0.1], [0.1, 0.3, 0.6]]
+                    )  # Example emission matrix
+Initial = np.array([[0.6], [0.4]])  # Example initial probabilities
+
+# Run Baum-Welch algorithm
+Transition, Emission = baum_welch(
+    Observations, Transition, Emission, Initial, iterations=10)
+
+print("Updated Transition Matrix:")
+print(np.round(Transition, 2))
+
+print("Updated Emission Matrix:")
+print(np.round(Emission, 2))
