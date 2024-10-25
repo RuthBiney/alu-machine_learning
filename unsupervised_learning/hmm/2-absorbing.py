@@ -11,7 +11,11 @@ def absorbing(P):
     '''
     Determines if a Markov chain is absorbing
     '''
-    if len(P.shape) != 2 or P.shape[0] != P.shape[1] or type(P) is not np.ndarray:
+    if (
+        len(P.shape) != 2 or
+        P.shape[0] != P.shape[1] or
+        type(P) is not np.ndarray
+    ):
         return None
 
     n = P.shape[0]
@@ -22,7 +26,7 @@ def absorbing(P):
         return False
 
     # Find absorbing states
-    absorbing_states = set(i for i in range(n) if P[i, i] == 1)
+    absorbing_states = {i for i in range(n) if P[i, i] == 1}
 
     # Check if each non-absorbing state can lead to an absorbing state
     for i in range(n):
