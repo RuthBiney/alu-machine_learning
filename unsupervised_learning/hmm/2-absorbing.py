@@ -10,24 +10,42 @@ import numpy as np
 
 def absorbing(P):
     '''
-        Determines if a markov chain is absorbing
+    Determines if a Markov chain is absorbing
     '''
-    if len(P.shape) != 2:
+    if len(P.shape) != 2 or P.shape[0] != P.shape[1] or type(P) is not np.ndarray:
         return None
-    n1, n2 = P.shape
-    if (n1 != n2) or type(P) is not np.ndarray:
-        return None
+
+    n = P.shape[0]
     D = np.diagonal(P)
     if (D == 1).all():
         return True
     if not (D == 1).any():
         return False
 
-    for i in range(n1):
-        # print('this is Pi {}'.format(P[i]))
-        for j in range(n2):
-            # print('this is Pj {}'.format(P[j]))
-            if (i == j) and (i + 1 < len(P)):
-                if P[i + 1][j] == 0 and P[i][j + 1] == 0:
-                    return False
+    # Find absorbing states
+    absorbing_states = set(i for i in range(n) if P[i, i] == 1)
+
+    # Check if each non-absorbing state can lead to an absorbing state
+    for i in range(n):
+        if i not in absorbing_states:
+            visited = set()
+            queue = [i]
+            found_absorbing = False
+
+            while queue and not found_absorbing:
+                state = queue.pop(0)
+                if state in visited:
+                    continue
+                visited.add(state)
+
+                for j in range(n):
+                    if P[state, j] > 0:  # There is a transition
+                        if j in absorbing_states:
+                            found_absorbing = True
+                            break
+                        queue.append(j)
+
+            if not found_absorbing:
+                return False
+
     return True
