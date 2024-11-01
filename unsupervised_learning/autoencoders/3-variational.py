@@ -9,17 +9,17 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     function that creates a variational autoencoder
     Args:
         input_dims: integer containing the dimensions of the model input
-        hidden_layers:  list containing the number of nodes for each hidden
-                        layer in the encoder, respectively
+        hidden_layers: list containing the number of nodes for each hidden
+                       layer in the encoder, respectively
         latent_dims: integer containing the dimensions of the latent space
                      representation
     Returns: encoder, decoder, auto
     """
 
+    # Encoder network
     X_input = keras.Input(shape=(input_dims,))
     Y_prev = X_input
 
-    # Encoder network
     for units in hidden_layers:
         hidden_ly = keras.layers.Dense(units=units, activation='relu')
         Y_prev = hidden_ly(Y_prev)
@@ -38,8 +38,7 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
         return z_m + keras.backend.exp(z_stand_dev / 2) * epsilon
 
     z = keras.layers.Lambda(sampling,
-                            output_shape=(latent_dims,))([z_mean,
-                                                          z_log_sigma])
+                            output_shape=(latent_dims,))([z_mean, z_log_sigma])
     encoder = keras.Model(X_input, [z, z_mean, z_log_sigma])
 
     # Decoder network
@@ -57,11 +56,14 @@ def autoencoder(input_dims, hidden_layers, latent_dims):
     d_output = decoder(e_output)
     auto = keras.Model(X_input, d_output)
 
+    # VAE loss function
     def vae_loss(x, x_decoder_mean):
         x_loss = keras.backend.binary_crossentropy(x, x_decoder_mean)
         x_loss = keras.backend.sum(x_loss, axis=-1)
         kl_loss = -0.5 * keras.backend.sum(
-            1 + z_log_sigma - keras.backend.square(z_mean) - keras.backend.exp(z_log_sigma), axis=-1)
+            1 + z_log_sigma - keras.backend.square(z_mean) -
+            keras.backend.exp(z_log_sigma), axis=-1
+        )
         return x_loss + kl_loss
 
     auto.compile(optimizer='adam', loss=vae_loss)
