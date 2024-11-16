@@ -21,5 +21,4 @@ This repository contains the implementation of a Deep Q-Learning (DQN) agent tra
    gym
    keras
    keras-rl2
-   numpy
-   pyth
+   numpyS
