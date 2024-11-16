@@ -1,33 +1,41 @@
+#!/usr/bin/env python3
+"""
+Script that displays a game played by the agent trained in `train.py`
+to play Atari's Breakout
+"""
+
+
 import gym
 import tensorflow.keras as K
 from rl.agents.dqn import DQNAgent
 from rl.memory import SequentialMemory
 
-# Set up the Breakout environment
-env = gym.make('Breakout-v0')
-nb_actions = env.action_space.n
-input_shape = env.observation_space.shape
 
-# Define the model (same as training)
-model = Sequential()
-model.add(Flatten(input_shape=(1,) + input_shape))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(nb_actions, activation='linear'))
+AtariProcessor = __import__('train').AtariProcessor
+create_CNN_model = __import__('train').create_CNN_model
 
-# Define replay memory
-memory = SequentialMemory(limit=50000, window_length=1)
 
-# Use a greedy policy for evaluation
-policy = GreedyQPolicy()
+def playing():
+    """
+    Displays a game played by the agent trained to play Atari's Breakout
+    """
+    env = gym.make('Breakout-v0')
+    env.reset()
+    nb_actions = env.action_space.n
+    model, frames = create_CNN_model(nb_actions)
+    memory = SequentialMemory(limit=1000000, window_length=frames)
+    processor = AtariProcessor()
+    dqn = DQNAgent(model=model,
+                   nb_actions=nb_actions,
+                   processor=processor,
+                   memory=memory)
+    dqn.compile(K.optimizers.Adam(lr=0.00025),
+                metrics=['mae'])
+    dqn.load_weights('policy.h5')
+    dqn.test(env,
+             nb_episodes=10,
+             visualize=True)
 
-# Set up the DQN agent
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
-               target_model_update=1e-2, policy=policy)
-dqn.compile(optimizer='adam', metrics=['mae'])
 
-# Load the trained policy
-dqn.load_weights('policy.h5')
-
-# Evaluate the agent
-dqn.test(env, nb_episodes=5, visualize=True)
+if __name__ == '__main__':
+    playing()
