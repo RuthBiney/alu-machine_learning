@@ -15,10 +15,12 @@ This repository contains the implementation of a Deep Q-Learning (DQN) agent tra
    ```bash
    python train.py
    ```
-   Requirements
-   Python 3.8+
-   Libraries:
-   gym
-   keras
-   keras-rl2
-   numpyS
+
+#### Requirements
+
+Python 3.8+
+Libraries:
+gym
+keras
+keras-rl2
+numpyS
