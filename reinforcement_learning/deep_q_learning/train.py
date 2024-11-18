@@ -1,15 +1,12 @@
-#!/usr/bin/env python3
-"""
-Script that trains an agent that can play Atari's Breakout
-"""
-
-
 import gym
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D
-from rl.agents.dqn import DQNAgent
+import gymnasium as gym
+from keras.models import Sequential
+from keras.layers import Dense, Flatten
+from keras.optimizers import Adam
+from rl.agents import DQNAgent
 from rl.memory import SequentialMemory
-from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
+from rl.policy import EpsGreedyQPolicy
+import numpy as np
 
 # Set up the Breakout environment with preprocessing
 from gym.wrappers import AtariPreprocessing, FrameStack
